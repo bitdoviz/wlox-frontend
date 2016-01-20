@@ -1111,7 +1111,7 @@ a.button_slider:hover {
 .graph_contain{position:relative;margin:0;background-color: #fff;border: 1px solid #ddd;}
 .graph_contain .clear_300{margin-top:305px;float:left;}
 .global_stats{}
-.global_stats .stat1{font-size: 20px;color: #383634;white-space: nowrap;padding:10px 0 6px;}
+.global_stats .stat1{font-size: 20px;color: #383634;white-space: nowrap;padding:10px 0;height: 22px;}
 .global_stats .stat1.smaller{font-size:17px;}
 .global_stats .stat1 .cc{float:none;}
 .global_stats .stat1 small{font-size: 14px;}

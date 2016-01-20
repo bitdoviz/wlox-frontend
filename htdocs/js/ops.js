@@ -2126,7 +2126,7 @@ function reorderLabels(is_crypto) {
 			
 			$(el).after($(this));
 		});
-		$('.stat1').css('fontSize','18px');
+		$('.stat1').addClass('smaller');
 	}
 	else {
 		$('.buy_currency_char,.sell_currency_char').removeClass('cc');
@@ -2141,7 +2141,7 @@ function reorderLabels(is_crypto) {
 			
 			$(el).before($(this));
 		});
-		$('.stat1').css('fontSize','20px');
+		$('.stat1').removeClass('smaller');
 	}
 
 	reorderRowLabels();

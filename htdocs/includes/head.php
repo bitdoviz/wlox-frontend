@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
     
     <!-- responsive devices styles -->
-	<link rel="stylesheet" media="screen" href="css/responsive-leyouts.css?v=20151204" type="text/css" />
+	<link rel="stylesheet" media="screen" href="css/responsive-leyouts.css?v=20160120" type="text/css" />
     
     <? if ($CFG->self == 'security.php') { ?>
     <!-- authy -->
