@@ -57,8 +57,19 @@ class User {
 		if (!empty($result['error']) || !empty($query['error']) || !isset($result)) {
 			$session_id = session_id();
 			if (!empty($session_id)) {
+				$lang = $_SESSION['language'];
+				$chat_height = $_SESSION['chat_height'];
+				$currency = $_SESSION['currency'];
+				$c_currency = $_SESSION['c_currency'];
+				
+				unset($_SESSION);
 				session_destroy();
-				$_SESSION = array();
+				session_start();
+				
+				$_SESSION['language'] = $lang;
+				$_SESSION['chat_height'] = $chat_height;
+				$_SESSION['currency'] = $currency;
+				$_SESSION['c_currency'] = $c_currency;
 			}
 			return false;
 		}
@@ -129,10 +140,18 @@ class User {
 			API::send();
 			
 			$lang = $_SESSION['language'];
+			$chat_height = $_SESSION['chat_height'];
+			$currency = $_SESSION['currency'];
+			$c_currency = $_SESSION['c_currency'];
+			
 			unset($_SESSION);
 			session_destroy();
 			session_start();
+			
 			$_SESSION['language'] = $lang;
+			$_SESSION['chat_height'] = $chat_height;
+			$_SESSION['currency'] = $currency;
+			$_SESSION['c_currency'] = $c_currency;
 			
 			self::$logged_in = false;
 			self::$info = false;
