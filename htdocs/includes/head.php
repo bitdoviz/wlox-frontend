@@ -23,30 +23,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     <!-- Google fonts - witch you want to use - (rest you can just remove) -->
-    <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,800,700italic,700,600italic,600,400italic,300italic,300|Roboto:100,300,400,500,700&amp;subset=latin,latin-ext' type='text/css' />
+    <link href='https://fonts.googleapis.com/css?family=Orbitron:400,500,700,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     
     <!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
     
     <!-- ######### CSS STYLES ######### -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 	<link rel="stylesheet" href="css/style.css?v=20151203" type="text/css" />
     <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
     
     <!-- responsive devices styles -->
 	<link rel="stylesheet" media="screen" href="css/responsive-leyouts.css?v=20151204" type="text/css" />
-    
-<!-- just remove the below comments witch color skin you want to use -->
-    <!--<link rel="stylesheet" href="css/colors/lightblue.css" />-->
-    <!--<link rel="stylesheet" href="css/colors/lightgreen.css" />-->
-    <!--<link rel="stylesheet" href="css/colors/blue.css" />-->
-    <!--<link rel="stylesheet" href="css/colors/green.css" />-->
-    <!--<link rel="stylesheet" href="css/colors/red.css" />-->
-    <link rel="stylesheet" href="css/colors/cyan.css" />
-    <!--<link rel="stylesheet" href="css/colors/purple.css" />-->
-    <!--<link rel="stylesheet" href="css/colors/pink.css" />-->
-    <!--<link rel="stylesheet" href="css/colors/brown.css" />-->
-    
     
     <? if ($CFG->self == 'security.php') { ?>
     <!-- authy -->
@@ -91,6 +80,10 @@
 <input type="hidden" id="orders_converted_from" value="<?= Lang::string('orders-converted-from') ?>" />
 <input type="hidden" id="your_order" value="<?= Lang::string('home-your-order') ?>" />
 <input type="hidden" id="order-cancel-all-conf" value="<?= Lang::string('order-cancel-all-conf') ?>" />
+<input type="hidden" id="orders-click-price-buy" value="<?= Lang::string('orders-click-price-buy') ?>" />
+<input type="hidden" id="orders-click-price-sell" value="<?= Lang::string('orders-click-price-sell') ?>" />
+<input type="hidden" id="orders-click-amount-buy" value="<?= Lang::string('orders-click-amount-buy') ?>" />
+<input type="hidden" id="orders-click-amount-sell" value="<?= Lang::string('orders-click-amount-sell') ?>" />
 <input type="hidden" id="this_currency_id" value="<?= (!empty($currency_info)) ? $currency_info['id'] : 0 ?>" />
 <input type="hidden" id="chat_handle" value="<?= (User::isLoggedIn()) ? User::$info['chat_handle'] : 'not-logged-in' ?>" />
 <input type="hidden" id="chat_baseurl" value="<?= ($CFG->chat_baseurl) ? $CFG->chat_baseurl : $CFG->baseurl ?>" />
@@ -119,9 +112,7 @@
                 <li>|</li>
                 <li><a href="<?= Lang::url('contact.php') ?>"><?= Lang::string('contact') ?></a></li>
                 <li>|</li>
-                <li><a target="_blank" href="https://github.com/wlox/wlox/"><i class="fa fa-github"></i> GitHub</a></li>
-                <li>|</li>
-                <li><a target="_blank" href="https://cryptocapital.co"><img src="images/crypto_logo.png" /></a></li>
+                <li><a target="_blank" href="https://github.com/mbassan/wlox/"><i class="fa fa-github"></i> GitHub</a></li>
             </ul>
         
             <ul class="tci_list">
@@ -232,7 +223,7 @@
 		</div>
 		
 	</div>
-    
+    <div class="bg"></div>
 	</div>
     
 </header><!-- end header -->

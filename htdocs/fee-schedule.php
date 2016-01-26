@@ -5,13 +5,22 @@ $currencies = Settings::sessionCurrency();
 $currency1 = $currencies['currency'];
 $c_currency1 = $currencies['c_currency'];
 
+if ($_REQUEST['fee_currency'])
+	$currency1 = preg_replace("/[^0-9]/", "",$_REQUEST['fee_currency']);
+
 API::add('Content','getRecord',array('fee-schedule'));
 API::add('FeeSchedule','get',array($currency1));
+API::add('Currencies','getMain');
 $query = API::send();
 
 $content = $query['Content']['getRecord']['results'][0];
-$page_title = $content['title'];
+$main = $query['Currencies']['getMain']['results'][0];
+$main_usd_ask = $CFG->currencies[$main['fiat']]['usd_ask'];
+$this_usd_ask = $CFG->currencies[$currency1]['usd_ask'];
+$currency_info = $CFG->currencies[$currency1];
 $fee_schedule = $query['FeeSchedule']['get']['results'][0];
+
+$page_title = $content['title'];
 
 include 'includes/head.php';
 ?>
@@ -23,7 +32,7 @@ include 'includes/head.php';
 </div>
 <div class="container">
 	<div class="content_right">
-    	<div class="text"><?= $content['content'] ?></div>
+    	<div class="text1"><?= $content['content'] ?></div>
     	<div class="clearfix mar_top2"></div>
     	<div class="table-style">
     		<table class="table-list trades">
@@ -32,7 +41,7 @@ include 'includes/head.php';
 					<th><?= Lang::string('fee-schedule-fee') ?></th>
 					<th>
 						<?= Lang::string('fee-schedule-volume') ?>
-						<span class="graph_options" style="margin-left:5px;">
+						<span class="graph_options" style="display: inline-block; padding: 0px; margin-left: 5px; top: 0px; position: relative;">
 							<span style="margin:0;float:none;display:inline;">
 								<select id="fee_currency">
 								<? 
@@ -49,7 +58,7 @@ include 'includes/head.php';
 							</span>
 						</span>
 					</th>
-					<th><?= Lang::string('fee-schedule-flc') ?></th>
+					<!--th><?= Lang::string('fee-schedule-flc') ?></th -->
 				</tr>
 				<? 
 				if ($fee_schedule) {
@@ -57,13 +66,13 @@ include 'includes/head.php';
 					$last_btc = false;
 					foreach ($fee_schedule as $fee) {
 						$symbol = ($fee['to_usd'] > 0) ? '<' : '>';
-						$from = ($fee['to_usd'] > 0) ? String::currency($fee['to_usd'],0) : String::currency($fee['from_usd'],0);
+						$from = ($fee['to_usd'] > 0) ? String::currency(($fee['to_usd'] * $main_usd_ask)/$this_usd_ask,0) : String::currency(($fee['from_usd'] * $main_usd_ask)/$this_usd_ask,0);
 				?>
 				<tr>
 					<?= ($fee['fee1'] != $last_fee1) ? '<td>'.$fee['fee1'].'%</td>' : '<td class="inactive"></td>' ?>
 					<td><?= $fee['fee'] ?>%</td>
-					<td><?= $symbol.' '.$fee['fa_symbol'].$from ?></td>
-					<?= ($fee['global_btc'] != $last_btc) ? '<td>'.String::currency($fee['global_btc']).' '.$CFG->currencies[$c_currency1]['currency'].'</td>' : '<td class="inactive"></td>' ?>
+					<td><?= $symbol.' '.$currency_info['fa_symbol'].$from ?></td>
+					<? ($fee['global_btc'] != $last_btc) ? '<td>'.number_format($fee['global_btc'],1).' BTC</td>' : '<td class="inactive"></td>' ?>
 				</tr>
 				<?
 						$last_fee1 = $fee['fee1'];

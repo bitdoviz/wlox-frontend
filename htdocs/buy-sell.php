@@ -613,7 +613,7 @@ if (!$bypass) {
 								echo '
 						<tr id="bid_'.$bid['id'].'" class="bid_tr">
 							<td>'.$mine.'<span class="buy_currency_char">'.$currency_info['fa_symbol'].'</span><a class="order_price click" title="'.Lang::string('orders-click-price-sell').'" href="#">'.String::currency($bid['btc_price'],($currency_info['is_crypto'] == 'Y')).'</a> '.(($bid['btc_price'] != $bid['fiat_price']) ? '<a title="'.str_replace('[currency]',$CFG->currencies[$bid['currency']]['currency'],Lang::string('orders-converted-from')).'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '').'</td>
-							<td><a class="order_amount click" title="'.Lang::string('orders-click-amount-sell').'" href="#">'.String::currency($bid['btc'],true).'</a></td>
+							<td><a class="order_amount click" title="'.Lang::string('orders-click-amount-sell').'" href="#">'.String::currency($bid['btc'],true).'</a> '.$c_currency_info['currency'].'</td>
 							<td><span class="buy_currency_char">'.$currency_info['fa_symbol'].'</span><span class="order_value">'.String::currency(($bid['btc_price'] * $bid['btc']),($currency_info['is_crypto'] == 'Y')).'</span></td>
 						</tr>';
 							}
@@ -639,7 +639,7 @@ if (!$bypass) {
 								echo '
 						<tr id="ask_'.$ask['id'].'" class="ask_tr">
 							<td>'.$mine.'<span class="buy_currency_char">'.$currency_info['fa_symbol'].'</span><a class="order_price click" title="'.Lang::string('orders-click-price-buy').'" href="#">'.String::currency($ask['btc_price'],($currency_info['is_crypto'] == 'Y')).'</a> '.(($ask['btc_price'] != $ask['fiat_price']) ? '<a title="'.str_replace('[currency]',$CFG->currencies[$ask['currency']]['currency'],Lang::string('orders-converted-from')).'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '').'</td>
-							<td><a class="order_amount click" title="'.Lang::string('orders-click-amount-buy').'" href="#">'.String::currency($ask['btc'],true).'</a></td>
+							<td><a class="order_amount click" title="'.Lang::string('orders-click-amount-buy').'" href="#">'.String::currency($ask['btc'],true).'</a> '.$c_currency_info['currency'].'</td>
 							<td><span class="buy_currency_char">'.$currency_info['fa_symbol'].'</span><span class="order_value">'.String::currency(($ask['btc_price'] * $ask['btc']),($currency_info['is_crypto'] == 'Y')).'</span></td>
 						</tr>';
 							}

@@ -76,7 +76,7 @@ function graphPriceHistory(refresh) {
 		data_zoom = 1;
 		
 		// setup candles series
-		candlestick_options = {show:true,lineWidth:candle_w+'px',rangeWidth:candle_line_w,downColor:'#e51919',upColor:'#16e758',rangeColor:'#848484',neutralColor:'#848484'};
+		candlestick_options = {show:true,lineWidth:candle_w+'px',rangeWidth:candle_line_w,downColor:'#e51919',upColor:'#16e758',rangeColor:'#dddddd',neutralColor:'#dddddd'};
 		series = $.plot.candlestick.createCandlestick({
 			data:data,
 			candlestick:candlestick_options
@@ -194,7 +194,7 @@ function graphPriceHistory(refresh) {
      		},
      		crosshair: {
      			mode:"x",
-     		    color: "#aaaaaa",
+     		    color: "#888888",
      		    lineWidth: 1
      		}
 		});
@@ -583,24 +583,28 @@ function graphSettings() {
 }
 
 function graphClickAdd() {
+	$('#bids_list .order_price').unbind();
 	$('#bids_list .order_price').click(function(e){
 		$('#sell_price').val($(this).text());
 		blink('#sell_price');
 		$("html, body").animate({ scrollTop: $('.testimonials-4').offset().top }, 500);
 		e.preventDefault();
 	});
+	$('#bids_list .order_amount').unbind();
 	$('#bids_list .order_amount').click(function(e){
 		$('#sell_amount').val($(this).text());
 		blink('#sell_amount');
 		$("html, body").animate({ scrollTop: $('.testimonials-4').offset().top }, 500);
 		e.preventDefault();
 	});
+	$('#asks_list .order_price').unbind();
 	$('#asks_list .order_price').click(function(e){
 		$('#buy_price').val($(this).text());
 		blink('#buy_price');
 		$("html, body").animate({ scrollTop: $('.testimonials-4').offset().top }, 500);
 		e.preventDefault();
 	});
+	$('#asks_list .order_amount').unbind();
 	$('#asks_list .order_amount').click(function(e){
 		$('#buy_amount').val($(this).text());
 		blink('#buy_amount');
@@ -783,14 +787,14 @@ function graphOrders(json_data,refresh) {
  		yaxis: {
  		},
  		grid: { 
- 			backgroundColor: '#FFFFFF',
+ 			backgroundColor: '#1c1e22',
  			borderWidth: 1,
- 			borderColor: '#aaaaaa',
+ 			borderColor: '#000000',
  			hoverable: true
  		},
  		crosshair: {
  			mode:"x",
- 		    color: "#aaaaaa",
+ 		    color: "#888888",
  		    lineWidth: 1
  		}
  	});
@@ -1458,7 +1462,7 @@ function updateTransactions() {
 						$('#stats_max').html(formatCurrency(this.btc_price));
 					
 					if (!notrades) {
-						var elem = $('<tr id="order_'+this.id+'"><td><span class="time_since"></span><input type="hidden" class="time_since_seconds" value="'+this.time_since+'" /></td><td>'+this.btc+' '+($('#curr_abbr_'+this.c_currency).val())+'</td><td><span class="buy_currency_char">' + this_fa_symbol + '</span><span>' + formatCurrency(this.btc_price,($('#is_crypto').val() == 'Y')) + '</span>' + this_currency_abbr + '</td></tr>').insertAfter(insert_elem);
+						var elem = $('<tr id="order_'+this.id+'"><td><span class="time_since"></span><input type="hidden" class="time_since_seconds" value="'+this.time_since+'" /></td><td>'+this.btc+' '+this_c_currency_abbr+'</td><td><span class="buy_currency_char">' + this_fa_symbol + '</span><span>' + formatCurrency(this.btc_price,($('#is_crypto').val() == 'Y')) + '</span>' + this_currency_abbr + '</td></tr>').insertAfter(insert_elem);
 						insert_elem = elem;
 						
 						timeSince($(elem).find('.time_since'));
@@ -1592,6 +1596,20 @@ function updateTransactions() {
 							var usd_price = '';
 							var reorder_class = (open_orders_user) ? 'currency_char' : 'buy_currency_char';
 							var crypto_hidden = (open_orders_user) ? '<input type="hidden" class="is_crypto" value="'+json_elem.is_crypto+'" />' : '';
+							var this_c_currency_abbr = (open_orders_user) ? $('#curr_abbr_'+json_elem.c_currency).val() : $('#curr_abbr_'+c_currency).val();
+							
+							if ($('#buy_amount').length > 0) {
+								var cont_price1 = '<a class="order_price click" title="'+($('#orders-click-price-sell').val())+'" href="#">';
+								var cont_price2 = '</a>';
+								var cont_amount1 = '<a class="order_amount click" title="'+($('#orders-click-amount-sell').val())+'" href="#">';
+								var cont_amount2 = '</a>';
+							}
+							else {
+								var cont_price1 = '<span class="order_price">';
+								var cont_price2 = '</span>';
+								var cont_amount1 = '<span class="order_amount">';
+								var cont_amount2 = '</span>';
+							}
 							
 							if (open_orders_user) {
 								var double = 0;
@@ -1610,10 +1628,10 @@ function updateTransactions() {
 							}
 							
 							var edit_str = (open_orders_user) ? '<td><a title="'+$('#cfg_orders_edit').val()+'" href="edit-order.php?order_id='+json_elem.id+'"><i class="fa fa-pencil"></i></a> <a title="'+$('#cfg_orders_delete').val()+'" href="open-orders.php?delete_id='+json_elem.id+'&uniq='+$('#uniq').val()+'"><i class="fa fa-times"></i></a></td>' : false;
-							var string = '<tr class="bid_tr" id="bid_'+json_elem.id+'">'+crypto_hidden+usd_price+type+'<td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_price">'+formatCurrency(((json_elem.btc_price > 0) ? json_elem.btc_price : json_elem.stop_price),is_crypto)+'</span> '+((parseFloat(json_elem.btc_price) != parseFloat(json_elem.fiat_price)) ? '<a title="'+$('#orders_converted_from').val().replace('[currency]',currency_abbr)+'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '')+'</td><td><span class="order_amount">'+json_elem.btc+'</span></td><td><span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td>'+edit_str+'</tr>';
+							var string = '<tr class="bid_tr" id="bid_'+json_elem.id+'">'+crypto_hidden+usd_price+type+'<td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span>'+cont_price1+formatCurrency(((json_elem.btc_price > 0) ? json_elem.btc_price : json_elem.stop_price),is_crypto)+cont_price2+'</span> '+((parseFloat(json_elem.btc_price) != parseFloat(json_elem.fiat_price)) ? '<a title="'+$('#orders_converted_from').val().replace('[currency]',currency_abbr)+'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '')+'</td><td>'+cont_amount1+json_elem.btc+cont_amount2+' '+this_c_currency_abbr+'</td><td><span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td>'+edit_str+'</tr>';
 						
 							if (double)
-								string += '<tr class="bid_tr double" id="bid_'+json_elem.id+'">'+crypto_hidden+'<td><div class="identify stop_order">S</div></td><td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency(json_elem.stop_price,is_crypto))+'</span></td><td><span class="order_amount">'+json_elem.btc+'</span></td><td><span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td><td><span class="oco"><i class="fa fa-arrow-up"></i> OCO</span></td></tr>';
+								string += '<tr class="bid_tr double" id="bid_'+json_elem.id+'">'+crypto_hidden+'<td><div class="identify stop_order">S</div></td><td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency(json_elem.stop_price,is_crypto))+'</span></td><td><span class="order_amount">'+json_elem.btc+'</span> '+this_c_currency_abbr+'</td><td><span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td><td><span class="oco"><i class="fa fa-arrow-up"></i> OCO</span></td></tr>';
 						}
 						else
 							var string = '<tr class="bid_tr" id="bid_'+json_elem.id+'"><td>'+mine+'<span class="order_amount">'+json_elem.btc+'</span> '+($('#curr_abbr_'+json_elem.c_currency).val())+'</td><td><span class="buy_currency_char">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency(json_elem.btc_price),is_crypto)+'</span> '+((parseFloat(json_elem.btc_price) != parseFloat(json_elem.fiat_price)) ? '<a title="'+$('#orders_converted_from').val().replace('[currency]',currency_abbr)+'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '')+'</td></tr>';
@@ -1749,6 +1767,20 @@ function updateTransactions() {
 							var usd_price = '';
 							var reorder_class = (open_orders_user) ? 'currency_char' : 'buy_currency_char';
 							var crypto_hidden = (open_orders_user) ? '<input type="hidden" class="is_crypto" value="'+json_elem.is_crypto+'" />' : '';
+							var this_c_currency_abbr = (open_orders_user) ? $('#curr_abbr_'+json_elem.c_currency).val() : $('#curr_abbr_'+c_currency).val();
+							
+							if ($('#buy_amount').length > 0) {
+								var cont_price1 = '<a class="order_price click" title="'+($('#orders-click-price-buy').val())+'" href="#">';
+								var cont_price2 = '</a>';
+								var cont_amount1 = '<a class="order_amount click" title="'+($('#orders-click-amount-buy').val())+'" href="#">';
+								var cont_amount2 = '</a>';
+							}
+							else {
+								var cont_price1 = '<span class="order_price">';
+								var cont_price2 = '</span>';
+								var cont_amount1 = '<span class="order_amount">';
+								var cont_amount2 = '</span>';
+							}
 							
 							if (open_orders_user) {
 								var double = 0;
@@ -1767,10 +1799,10 @@ function updateTransactions() {
 							}
 							
 							var edit_str = (open_orders_user) ? '<td><a title="'+$('#cfg_orders_edit').val()+'" href="edit-order.php?order_id='+json_elem.id+'"><i class="fa fa-pencil"></i></a> <a title="'+$('#cfg_orders_delete').val()+'" href="open-orders.php?delete_id='+json_elem.id+'&uniq='+$('#uniq').val()+'"><i class="fa fa-times"></i></a></td>' : false;
-							var string = '<tr class="ask_tr" id="ask_'+json_elem.id+'">'+crypto_hidden+usd_price+type+'<td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency((json_elem.btc_price > 0) ? json_elem.btc_price : json_elem.stop_price,is_crypto))+'</span> '+((parseFloat(json_elem.btc_price) != parseFloat(json_elem.fiat_price)) ? '<a title="'+$('#orders_converted_from').val().replace('[currency]',currency_abbr)+'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '')+'</td><td><span class="order_amount">'+json_elem.btc+'</span></td><td><span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td>'+edit_str+'</tr>';
+							var string = '<tr class="ask_tr" id="ask_'+json_elem.id+'">'+crypto_hidden+usd_price+type+'<td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span>'+cont_price1+(formatCurrency((json_elem.btc_price > 0) ? json_elem.btc_price : json_elem.stop_price,is_crypto))+cont_price2+' '+((parseFloat(json_elem.btc_price) != parseFloat(json_elem.fiat_price)) ? '<a title="'+$('#orders_converted_from').val().replace('[currency]',currency_abbr)+'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '')+'</td><td>'+cont_amount1+json_elem.btc+cont_amount2+'</span> '+this_c_currency_abbr+'</td><td><span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td>'+edit_str+'</tr>';
 							
 							if (double)
-								string += '<tr class="ask_tr double" id="ask_'+json_elem.id+'">'+crypto_hidden+'<td><div class="identify stop_order">S</div></td><td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency(json_elem.stop_price,is_crypto))+'</span></td><td><span class="order_amount">'+json_elem.btc+'</span></td><td>'+fa_symbol+'<span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td><td><span class="oco"><i class="fa fa-arrow-up"></i> OCO</span></td></tr>';
+								string += '<tr class="ask_tr double" id="ask_'+json_elem.id+'">'+crypto_hidden+'<td><div class="identify stop_order">S</div></td><td>'+mine+'<span class="'+reorder_class+'">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency(json_elem.stop_price,is_crypto))+'</span></td><td><span class="order_amount">'+json_elem.btc+'</span> '+this_c_currency_abbr+'</td><td>'+fa_symbol+'<span class="order_value">'+formatCurrency(parseFloat(json_elem.btc) * parseFloat(json_elem.btc_price),is_crypto)+'</span></td><td><span class="oco"><i class="fa fa-arrow-up"></i> OCO</span></td></tr>';
 						}
 						else
 							var string = '<tr class="ask_tr" id="ask_'+json_elem.id+'"><td>'+mine+'<span class="order_amount">'+json_elem.btc+'</span> '+($('#curr_abbr_'+json_elem.c_currency).val())+'</td><td><span class="buy_currency_char">'+fa_symbol+'</span><span class="order_price">'+(formatCurrency(json_elem.btc_price,is_crypto))+'</span> '+((parseFloat(json_elem.btc_price) != parseFloat(json_elem.fiat_price)) ? '<a title="'+$('#orders_converted_from').val().replace('[currency]',currency_abbr)+'" class="fa fa-exchange" href="" onclick="return false;"></a>' : '')+'</td></tr>';
@@ -1831,6 +1863,7 @@ function updateTransactions() {
 			$('#buy_user_available').html(json_data.available_fiat);
 			$('#sell_user_available').html(json_data.available_btc);
 			reorderLabels(($('#is_crypto').val() == 'Y'));
+			graphClickAdd();
 		});
 	},(!notrades ? 2000 : 5000));
 }
@@ -1955,7 +1988,7 @@ function switchBuyCurrency() {
 		$.getJSON("includes/ajax.get_currency.php?currency="+currency+'&c_currency='+c_currency,function(json_data) {
 			if ($('#unit_cost').length > 0) {
 				$('#usd_ask').val(json_data.currency_info.usd_ask);
-				$('.sell_currency_label,.buy_currency_label,.currency_label').html(currency.toUpperCase());
+				$('.sell_currency_label,.buy_currency_label,.currency_label').html(json_data.currency_info.currency);
 				$('.sell_currency_char,.buy_currency_char,.currency_char').html(((json_data.currency_info.is_crypto != 'Y') ? json_data.currency_info.fa_symbol : ''));
 				$('#buy_currency,#sell_currency').val(currency);
 				$('#user_available').html(((json_data.currency_info.is_crypto != 'Y') ? json_data.available_fiat : json_data.available_btc));
@@ -2038,6 +2071,17 @@ function switchBuyCurrency() {
 			reorderLabels((json_data.currency_info.is_crypto == 'Y'));
 			calculateBuyPrice();
 		});
+	});
+}
+
+function switchDepositCurrency() {
+	$('#gateway_type').bind("keyup change", function(){
+		$('.hide_section').css('display','none');
+		$('.'+$(this).val()+'_format').fadeIn(400);
+	});
+	
+	$('#gateway_currency').bind("keyup change", function(){
+		$('.currency_abbr').html($('#curr_abbr_'+$(this).val()).val());
 	});
 }
 
@@ -2686,6 +2730,7 @@ $(document).ready(function() {
 	filtersUpdate();
 	paginationUpdate();
 	switchBuyCurrency();
+	switchDepositCurrency();
 	calculateBuy();
 	buttonDisable();
 	localDates();
