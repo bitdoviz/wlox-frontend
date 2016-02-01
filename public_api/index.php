@@ -1,6 +1,6 @@
 <?php 
 include '../lib/common.php';
-
+error_log(print_r(array($_REQUEST['endpoint']),1),3,ini_get('error_log'));
 $CFG->public_api = true;
 $post = ($_SERVER['REQUEST_METHOD'] == 'POST');
 $params_json = file_get_contents('php://input');

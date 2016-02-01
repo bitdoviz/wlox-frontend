@@ -11,7 +11,7 @@
     
    		<div class="one_fourth">
             
-            <div class="footer_logo"><img src="images/logo4.png" alt="" /></div>
+            <div class="footer_logo"><img src="images/bitdoviz1.png" alt="" /></div>
             
             <ul class="contact_address">
                 <li><img src="images/footer-wmap.png" alt="" /></li>

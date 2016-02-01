@@ -22,8 +22,8 @@
     <!-- this styles only adds some repairs on idevices  -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-    <!-- Google fonts - witch you want to use - (rest you can just remove) -->
-    <link href='https://fonts.googleapis.com/css?family=Orbitron:400,500,700,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <!-- Google fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Titillium+Web:400,300,400italic,600,700|Open+Sans:400,300,600,700&subset=latin,latin-ext,cyrillic' rel='stylesheet' type='text/css'>
     
     <!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -160,36 +160,15 @@
             <div id="menu" class="menu">
                 
                 <ul id="tiny">
-                    <li><a href="<?= Lang::url('index.php') ?>" <?= ($CFG->self == 'index.php' || !$CFG->self) ? 'class="active"' : '' ?>><?= Lang::string('home') ?></a></li>
-                    <li><a href="<?= Lang::url('order-book.php') ?>" <?= ($CFG->self == 'order-book.php') ? 'class="active"' : '' ?>><?= Lang::string('order-book') ?></a></li>
+                    <li><a href="<?= Lang::url('index.php') ?>" <?= ($CFG->self == 'index.php' || !$CFG->self) ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('home') ?></div><div class="bg"></div></a></li>
+                    <li><a href="<?= Lang::url('order-book.php') ?>" <?= ($CFG->self == 'order-book.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('order-book') ?></div><div class="bg"></div></a></li>
                     <? if (!User::isLoggedIn()) { ?>
-                    <!-- li><a href="what-are-bitcoins.php" <?= ($CFG->self == 'what-are-bitcoins.php' || $CFG->self == 'how-bitcoin-works.php' || $CFG->self == 'trading-bitcoins.php') ? 'class="active"' : '' ?>><?= Lang::string('what-are-bitcoins') ?> <i class="fa fa-angle-down"></i></a>
-                        <ul>
-                        	<li><a href="how-bitcoin-works.php"><?= Lang::string('how-bitcoin-works') ?></a></li>
-                            <li><a href="trading-bitcoins.php"><?= Lang::string('trading-bitcoins') ?></a></li>
-                        </ul>
-                    </li -->
-                    <li><a href="<?= Lang::url('our-security.php') ?>" <?= ($CFG->self == 'our-security.php') ? 'class="active"' : '' ?>><?= Lang::string('our-security') ?></a></li>
-                    <li><a href="<?= Lang::url('buy-and-sell-bitcoin.php') ?>" <?= ($CFG->self == 'buy-and-sell-bitcoin.php') ? 'class="active"' : '' ?>><?= Lang::string('how-to-register') ?> <!-- i class="fa fa-angle-down"></i --></a>
-                    	<!-- ul>
-                        	<li><a href="securing-account.php"><?= Lang::string('securing-account') ?></a></li>
-                        	<li><a href="reset_2fa.php"><?= Lang::string('reset-2fa') ?></a></li>
-                        	<li><a href="funding-account.php"><?= Lang::string('funding-account') ?></a></li>
-                        	<li><a href="withdrawing-account.php"><?= Lang::string('withdrawing-account') ?></a></li>
-                        </ul -->
-                    </li>
-                    <li><a href="<?= Lang::url('fee-schedule.php') ?>" <?= ($CFG->self == 'fee-schedule.php') ? 'class="active"' : '' ?>><?= Lang::string('fee-schedule') ?></a></li>
-                    <li><a href="<?= Lang::url('about.php') ?>" <?= ($CFG->self == 'about.php') ? 'class="active"' : '' ?>><?= Lang::string('about') ?> <!-- i class="fa fa-angle-down"></i --></a>
-                    	<!-- >ul>
-                        	<li><a href="our-security.php"><?= Lang::string('our-security') ?></a></li>
-                        	<li><a href="fee-schedule.php"><?= Lang::string('fee-schedule') ?></a></li->
-                        	<li><a href="press-releases.php"><?= Lang::string('news') ?></a></li>
-                        </ul -->
-                    </li>
-                    <li style="display:none;"><a href="login.php"><?= Lang::string('home-login') ?></a></li>
-	                <li style="display:none;"><a href="register.php"><?= Lang::string('home-register') ?></a></li>
+                    <li><a href="<?= Lang::url('our-security.php') ?>" <?= ($CFG->self == 'our-security.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('our-security') ?></div><div class="bg"></div></a></li>
+                    <li><a href="<?= Lang::url('buy-and-sell-bitcoin.php') ?>" <?= ($CFG->self == 'buy-and-sell-bitcoin.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('how-to-register') ?></div><div class="bg"></div></a></li>
+                    <li><a href="<?= Lang::url('fee-schedule.php') ?>" <?= ($CFG->self == 'fee-schedule.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('fee-schedule') ?></div><div class="bg"></div></a></li>
+                    <li><a href="<?= Lang::url('about.php') ?>" <?= ($CFG->self == 'about.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('about') ?></div><div class="bg"></div></a></li>
                     <? } else { ?>
-                    <li><a href="account.php" <?= ($CFG->self == 'account.php' || $CFG->self == 'open-orders.php' || $CFG->self == 'transactions.php' || $CFG->self == 'security.php' || $CFG->self == 'settings.php' || $CFG->self == 'bank-accounts.php' || $CFG->self == 'bitcoin-addresses.php' || $CFG->self == 'history.php' || $CFG->self == 'api-access.php') ? 'class="active"' : '' ?>><?= Lang::string('account') ?> <i class="fa fa-angle-down"></i></a>
+                    <li><a href="account.php" <?= ($CFG->self == 'account.php' || $CFG->self == 'open-orders.php' || $CFG->self == 'transactions.php' || $CFG->self == 'security.php' || $CFG->self == 'settings.php' || $CFG->self == 'bank-accounts.php' || $CFG->self == 'bitcoin-addresses.php' || $CFG->self == 'history.php' || $CFG->self == 'api-access.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('account') ?> <i class="fa fa-angle-down"></i></div><div class="bg"></div></a>
                         <ul>
                         	<li><a href="open-orders.php"><?= Lang::string('open-orders') ?></a></li>
                             <li><a href="transactions.php"><?= Lang::string('transactions') ?></a></li>
@@ -205,12 +184,9 @@
                             <li><a href="logout.php?log_out=1"><?= Lang::string('log-out') ?></a></li>
                         </ul>
                     </li>
-                    <li><a href="buy-sell.php" <?= ($CFG->self == 'buy-sell.php') ? 'class="active"' : '' ?>><?= Lang::string('buy-sell') ?></a></li>
-                    <li><a href="deposit.php" <?= ($CFG->self == 'deposit.php') ? 'class="active"' : '' ?>><?= Lang::string('deposit') ?></a></li>
-                    <li><a href="withdraw.php" <?= ($CFG->self == 'withdraw.php') ? 'class="active"' : '' ?>><?= Lang::string('withdraw') ?></a></li>
-                    <li style="display:none;"><a href="help.php"><?= Lang::string('help') ?></a></li>
-	                <li style="display:none;"><a href="contact.php"><?= Lang::string('contact') ?></a></li>
-	                <li style="display:none;"><a href="logout.php?log_out=1"><?= Lang::string('log-out') ?></a></li>
+                    <li><a href="buy-sell.php" <?= ($CFG->self == 'buy-sell.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('buy-sell') ?></div><div class="bg"></div></a></li>
+                    <li><a href="deposit.php" <?= ($CFG->self == 'deposit.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('deposit') ?></div><div class="bg"></div></a></li>
+                    <li><a href="withdraw.php" <?= ($CFG->self == 'withdraw.php') ? 'class="active"' : '' ?>><div class="contain"><?= Lang::string('withdraw') ?></div><div class="bg"></div></a></li>
 	                <? } ?>
                 </ul>
             </div>

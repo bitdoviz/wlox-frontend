@@ -327,7 +327,7 @@ if (!User::isLoggedIn()) {
         	</div>
         </div>
         <div class="one_half last">
-        	<h3><?= Lang::string('home-live-orders') ?> <a href="order-book.php" class="highlight gray"><i class="fa fa-plus-square"></i> <?= Lang::string('order-book-see') ?></a></h3>
+        	<h3><?= Lang::string('home-live-orders') ?></h3>
         	<div class="one_half">
         		<div class="table-style">
         			<table class="table-list trades" id="bids_list">
