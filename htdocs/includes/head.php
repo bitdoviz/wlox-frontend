@@ -30,7 +30,6 @@
 	<![endif]-->
     
     <!-- ######### CSS STYLES ######### -->
-    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 	<link rel="stylesheet" href="css/style.css?v=20151203" type="text/css" />
     <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
     

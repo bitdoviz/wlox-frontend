@@ -67,7 +67,7 @@ class Lang {
 		$urls['terms.php']['es'] = 'es/terminos.php';
 		$urls['terms.php']['ru'] = 'ru/'.urlencode('условия').'.php';
 		$urls['terms.php']['zh'] = 'zh/'.urlencode('条件').'.php';
-		
+
 		if (!$get_alts && !$get_js)
 			return $urls[$url][$CFG->language];
 		elseif ($get_alts) {

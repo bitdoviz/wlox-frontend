@@ -109,6 +109,7 @@ include 'includes/head.php';
     	</form>
     	<a class="forgot" href="register.php?"><?= Lang::string('login-dont-have') ?></a>
     </div>
+    <div class="bg"></div>
     <div class="clearfix mar_top8"></div>
 </div>
 <? include 'includes/foot.php'; ?>

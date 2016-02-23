@@ -1,4 +1,6 @@
 <?php
+
+@session_start();
 include '../lib/common.php';
 
 if (User::$info['locked'] == 'Y' || User::$info['deactivated'] == 'Y')
@@ -32,17 +34,25 @@ $page1 = (!empty($_REQUEST['page'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['pa
 $trans_realized1 = (!empty($_REQUEST['transactions'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['transactions']) : false;
 $bypass = !empty($_REQUEST['bypass']);
 
-API::add('Transactions','get',array(1,$page1,30,$c_currency1,$currency1,1,$start_date1,$type1,$order_by1));
-$query = API::send();
-$total = $query['Transactions']['get']['results'][0];
+/*
+get($count=false,$page=false,$per_page=false,$c_currency=false,$currency=false,$user=false,$start_date=false,$type=false,$order_by=false,
+$order_desc=false,
+        $public_api_all=false,$dont_paginate=false, $affiliates=false)
+*/
 
-API::add('Transactions','get',array(false,$page1,30,$c_currency1,$currency1,1,$start_date1,$type1,$order_by1));
-API::add('Transactions','getTypes');
+$user = false;
+
+API::add('Affiliates','get',array(1,$page1,30,$c_currency1,$currency1,$user,$start_date1,$type1,$order_by1,0,0,0,1));
+$query = API::send();
+$total = $query['Affiliates']['get']['results'][0];
+
+API::add('Affiliates','get',array(false,$page1,30,$c_currency1,$currency1,$user,$start_date1,$type1,$order_by1,0,0,0,1));
+API::add('Affiliates','getTypes');
 $query = API::send();
 
-$transactions = $query['Transactions']['get']['results'][0];
-$transaction_types = $query['Transactions']['getTypes']['results'][0];
-$pagination = Content::pagination('transactions.php',$page1,$total,30,5,false);
+$transactions = $query['Affiliates']['get']['results'][0];
+$transaction_types = $query['Affiliates']['getTypes']['results'][0];
+$pagination = Content::pagination('affiliate_info__transactions_detail.php',$page1,$total,30,5,false);
 
 $currency_info = ($currency1) ? $CFG->currencies[strtoupper($currency1)] : array();
 
@@ -62,9 +72,17 @@ if (!$bypass) {
 	</div>
 </div>
 <div class="container">
+
 	<div class="content_right">
 		<? Messages::display(); ?>
 		<div class="filters">
+
+            <ul id="tabnav">
+                <li class="tab1"><a href="affiliate_info__overview.php"><?= Lang::string('overview') ?></a></li>
+                <li class="tab2"><a href="affiliate_info__transactions_detail.php"><?= Lang::string('transactions-detail') ?></a></li>
+                <li class="tab3"><a href="affiliate_info__my_subordinates.php"><?= Lang::string('my-subordinates') ?></a></li>
+            </ul>
+
 			<input type="hidden" id="transactions_user" value="1" />
 			<form id="filters" method="GET" action="transactions.php">
 				<ul class="list_empty">
@@ -135,7 +153,6 @@ if (!$bypass) {
         		<input type="hidden" id="page" value="<?= $page1 ?>" />
         		<table class="table-list trades" id="transactions_list">
         			<tr id="table_first">
-        				<th><?= Lang::string('transactions-type') ?></th>
         				<th><?= Lang::string('transactions-time') ?></th>
         				<th><?= Lang::string('orders-amount') ?></th>
         				<th><?= Lang::string('transactions-fiat') ?></th>
@@ -145,11 +162,11 @@ if (!$bypass) {
         			<? 
         			if ($transactions) {
 						foreach ($transactions as $transaction) {
+
 							$trans_symbol = $CFG->currencies[$transaction['currency']]['fa_symbol'];
 							echo '
 					<tr id="transaction_'.$transaction['id'].'">
 						<input type="hidden" class="is_crypto" value="'.$transaction['is_crypto'].'" />
-						<td>'.$transaction['type'].'</td>
 						<td><input type="hidden" class="localdate" value="'.(strtotime($transaction['date'])).'" /></td>
 						<td>'.String::currency($transaction['btc'],true).' '.$CFG->currencies[$transaction['c_currency']]['fa_symbol'].'</td>
 						<td><span class="currency_char">'.$trans_symbol.'</span><span>'.String::currency($transaction['btc_net'] * $transaction['fiat_price'],($transaction['is_crypto'] == 'Y')).'</span></td>
@@ -170,5 +187,6 @@ if (!$bypass) {
 	</div>
 	<? include 'includes/sidebar_account.php'; ?>
 </div>
+
 <? include 'includes/foot.php'; ?>
 <? } ?>

@@ -3,7 +3,7 @@ class Content {
 	public static function pagination($link_url,$page,$total_rows,$rows_per_page=0,$max_pages=0,$pagination_label=false,$target_elem=false) {
 		global $CFG;
 	
-		$link_url = preg_replace("/[^a-zA-Z\.]/", "",$link_url);
+		$link_url = preg_replace("/[^a-zA-Z_\.]/", "",$link_url);
 		$page = preg_replace("/[^0-9]/", "",$page);
 		$total_rows = preg_replace("/[^0-9]/", "",$total_rows);
 		$rows_per_page = preg_replace("/[^0-9]/", "",$rows_per_page);

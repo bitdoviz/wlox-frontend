@@ -1,7 +1,7 @@
 <?php
 chdir('..');
 
-if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'more')
+if (empty($_REQUEST['action']) || ($_REQUEST['action'] != 'indicators' && $_REQUEST['action'] != 'chat_setting'))
 	$ajax = true;
 
 include '../lib/common.php';
@@ -95,10 +95,35 @@ $query = API::send();
 
 if ($action != 'more') {
 	$stats = $query['Stats']['getHistorical']['results'][0];
+	$vars = array();
 	if ($stats) {
 		foreach ($stats as $row) {
 			$vars[] = '['.$row['date'].','.$row['price'].']';
 		}
 	}
-	echo '['.implode(',', $vars).']';
+	$hist = '['.implode(',', $vars).']';
 }
+else {
+	$hist = '[]';
+}
+
+$first_id = 0;
+$last_id = 0;
+
+$data = $query['Transactions']['candlesticks']['results'][0];
+$vars = array();
+if ($data) {
+	$c = count($data) - 1;
+	$first_id = ($data[0]['first_id']) ? $data[0]['first_id'] : $data[0]['id'];
+	$last_id = ($data[0]['last_id']) ? $data[0]['last_id'] : $data[$c]['id'];
+	
+	foreach ($data as $key => $row) {
+		if (!($row['t'] > 0) || $key == 's_final' || $key == 'e_final')
+			continue;
+		
+		$vars[] = '['.(strtotime($row['t']) * 1000).','.$row['price'].','.$row['vol'].','.$row['id'].']';
+	}
+}
+$candles = '['.implode(',', $vars).']';
+
+echo '{"history":'.$hist.',"candles":'.$candles.',"first_id":'.$first_id.',"last_id":'.$last_id.'}';

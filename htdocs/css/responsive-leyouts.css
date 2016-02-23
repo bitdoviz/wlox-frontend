@@ -1,7 +1,7 @@
 /* Responsive CSS Styles Table of Contents */
 
 @media only screen and (min-width: 1170px){
-	.mobilebanner {  height: 620px;margin-top: -91px;padding: 191px 0 0;}
+	.mobilebanner {  height:445px;margin-top: -91px;padding: 191px 0 0;}
 	.mobilebanner h1 { font-size:42px;margin-bottom: 20px;}
 	.mobilebanner .text { font-size: 16px;line-height: 26px;}
 	.m_head {display:none;}

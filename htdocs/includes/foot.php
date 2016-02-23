@@ -14,7 +14,7 @@
             <div class="footer_logo"><img src="images/bitdoviz1.png" alt="" /></div>
             
             <ul class="contact_address">
-                <li><img src="images/footer-wmap.png" alt="" /></li>
+               
             </ul>
             
         </div>
@@ -75,16 +75,16 @@
     <div class="container">
         <div class="one_half">
 
-            <b>Copyright &copy; 2014 WLOX. All rights reserved.</b>
+            <b>Copyright &copy; 2016 BitDoviz. All rights reserved.</b>
 
         </div>
 
     	<div class="one_half last">
      		
-            <ul class="footer_social_links">
+            <!--  ul class="footer_social_links">
                 <li><a href="#"><i class="fa fa-facebook"></i></a></li>
                 <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-            </ul>
+            </ul -->
                 
     	</div>
     
