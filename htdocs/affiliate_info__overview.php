@@ -49,57 +49,8 @@ $user = false;
 API::add('Affiliates','getOverview',array());
 $query = API::send();
 
-print_r($query);
-
-/*
-Array
-(
-    [session] => 12
-    [Affiliates] => Array
-        (
-            [getOverview] => Array
-                (
-                    [results] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [income_30_day] => Array
-                                        (
-                                            [0] => Array
-                                                (
-                                                    [user] => 55388194
-                                                    [default_currency] => 27
-                                                    [default_c_currency] => 28
-                                                    [30_day_volume] => 1287134.1975551692
-                                                    [income] => 0
-                                                    [affiliates_fee] => 0.00000000
-                                                    [affiliates_fee1] => 0.00000000
-                                                )
-                                        )
-                                    [number_of_subordinates] => Array
-                                        (
-                                            [0] => Array
-                                                (
-                                                    [total] => 3
-                                                )
-                                        )
-                                    [current_cut] => Array
-                                        (
-                                            [0] => Array
-                                                (
-                                                    [NOW()] => 2016-02-22 20:34:32
-                                                )
-                                        )
-                                )
-                        )
-                )
-        )
-    [nonce_updated] => 
-)
-*/
-
 $info = array(
-    'total'                  => $query['Affiliates']['getOverview']['results']['0']['income_30_day']['0']['30_day_volume'],
+    'total-commissions'      => $query['Affiliates']['getOverview']['results']['0']['income_30_day']['0']['30_day_volume'],
     'income'                 => $query['Affiliates']['getOverview']['results']['0']['income_30_day']['0']['income'],
     'number-of-subordinates' => $query['Affiliates']['getOverview']['results']['0']['number_of_subordinates']['0']['total'],
     'current-cut'            => current($query['Affiliates']['getOverview']['results']['0']['current_cut']['0']),
@@ -136,8 +87,8 @@ include 'includes/head.php';
         		<table class="table-list trades" id="transactions_list">
         			 
         			<? foreach ($info as $k=>$v) { ?>
-                            <tr>
-                                <td><?= Lang::string($k) ?></td><td><?= $v ?></td>
+                            <tr align="left">
+                                <td align="left"><?= Lang::string($k) ?></td><td><?= $v ?></td>
                             </tr>
 					<? } ?>
         		</table>

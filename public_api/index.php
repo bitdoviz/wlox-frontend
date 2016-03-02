@@ -1,4 +1,5 @@
 <?php 
+
 include '../lib/common.php';
 
 $CFG->public_api = true;
@@ -21,6 +22,7 @@ else {
 	$params_json = json_encode($_POST,JSON_NUMERIC_CHECK);
 }
 
+
 $main = Currencies::getMain();
 $api_key1 = (!empty($_POST['api_key'])) ? preg_replace("/[^0-9a-zA-Z]/","",$_POST['api_key']) : false;
 $api_signature1 = (!empty($_POST['signature'])) ? preg_replace("/[^0-9a-zA-Z]/","",$_POST['signature']) : false;
@@ -34,7 +36,7 @@ $endpoint = $_REQUEST['endpoint'];
 $invalid_signature = false;
 $invalid_currency = false;
 $invalid_c_currency = false;
-
+ 
 // check if API key/signature received
 if ($api_key1 && (strlen($api_key1) != 16 || strlen($api_signature1) != 64)) {
 	$return['errors'][] = array('message'=>'Invalid API key or signature.','code'=>'AUTH_INVALID_KEY');
@@ -785,7 +787,157 @@ elseif ($endpoint == 'withdrawals/new') {
 		elseif (!$invalid_signature && !$invalid_currency)
 			$return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
 	}
+} elseif ($endpoint == 'affiliates/new-user') {
+
+
+    if ($invalid_signature || !$invalid_currency || $api_key1 || ($nonce1 < 1) ) {
+		 $return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
+    } elseif ($permissions['affiliates'] != 'Y') {
+	     $return['errors'][] = array('message'=>'Not Authorized.','code'=>'AUTH_NOT_AUTHORIZED');
+    } elseif($post) {
+
+        $user=false;
+        $user['affiliate'] = preg_replace("/[^0-9]/", '',$_POST['affiliate']);
+        $user['nonce'] = preg_replace("/[^0-9]./", '',$_POST['nonce']);
+
+        $user['cut'] = (!empty($_POST['cut']) && $_POST['cut'] > 0) ? number_format(preg_replace("/[^0-9.]/", "",$_POST['cut']),8,'.','') : false;
+
+        $user['email'] = (!empty($_REQUEST['email'])) ? preg_replace("/[^0-9a-zA-Z@\.\!#\$%\&\*+_\~\?\-]/", "",$_REQUEST['email']) : false;
+        $user['default_currency'] = (!empty($_REQUEST['default_currency'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['default_currency']) : false;
+
+        $user['first_name'] = preg_replace("/[^\pL a-zA-Z0-9@\s\._-]/u", "",$_POST['first_name']);
+        $user['last_name']  = preg_replace("/[^\pL a-zA-Z0-9@\s\._-]/u", "",$_POST['last_name']);
+        $user['country']    = preg_replace("/[^0-9]/", "",$_POST['country']);
+
+        // autocomplete currency if empty
+        if(!$user['default_currency']) {
+            API::add('Currencies','get',array());
+            API::apiKey($api_key1);
+            API::apiSignature($api_signature1,$params_json);
+            API::apiUpdateNonce();
+            $query = API::send($nonce1);
+            $user['default_currency'] = $query['Currencies'] ['get'] ['results'] ['0'] ['BTC'] ['id'];
+        }
+
+        API::add('User','registerNew',array( $user ));
+
+        API::apiKey($api_key1);
+        API::apiSignature($api_signature1,$params_json);
+        API::apiUpdateNonce();
+        $query = API::send($nonce1);
+
+        $status = empty($query['User']['registerNew']['results']['0']) ? 'FALSE': 'TRUE' ;
+
+        $return = array(
+            //'raw' => $query,
+            'status'=>$status,
+            'user' => $user,
+        );
+    }  
+
+} elseif ($endpoint == 'affiliates/overview') {
+
+    if ($invalid_signature || $invalid_currency || (!$api_key1) || ($nonce1 < 1) ) {
+		 $return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
+    } elseif ($permissions['p_affiliate'] != 'Y') {
+	     $return['errors'][] = array('message'=>'Not Authorized.','code'=>'AUTH_NOT_AUTHORIZED');
+    } elseif($post) {
+
+        // fast verification
+        $needed = explode(' ','affiliate api_key signature');
+
+        foreach($needed as $k){
+            if(empty($_POST[$k])){
+                $return['errors'][] = array(
+                    'message' => "Field {$k} is empty",
+                    'code'    => 'AFFILIATES_EMPTY_FIELD');
+            }
+        }
+
+        $user=false;
+        $user['affiliate'] = preg_replace("/[^0-9]/", '',$_POST['affiliate']);
+        $user['nonce'] = preg_replace("/[^0-9]./", '',$_POST['nonce']);
+
+        log_str("voy a enviar el overview ".print_r($user,1));
+
+
+        API::add('Affiliates','getOverview',array());
+        API::apiKey($api_key1);
+        API::apiSignature($api_signature1,$params_json);
+        API::apiUpdateNonce();
+        $query = API::send($nonce1);
+
+        $return = array(
+            'total_commissions'      => $query['Affiliates']['getOverview']['results']['0']['income_30_day']['0']['30_day_volume'],
+            'income'                 => $query['Affiliates']['getOverview']['results']['0']['income_30_day']['0']['income'],
+            'subordinates' => $query['Affiliates']['getOverview']['results']['0']['number_of_subordinates']['0']['total'],
+            'current-cut'            => current($query['Affiliates']['getOverview']['results']['0']['current_cut']['0']),
+        ); 
+    } // post
+
+} elseif ($endpoint == 'affiliates/subordinates') {
+
+    if ($invalid_signature || $invalid_currency || (!$api_key1) || ($nonce1 < 1) ) {
+		 $return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
+    } elseif ($permissions['p_affiliate'] != 'Y') {
+	     $return['errors'][] = array('message'=>'Not Authorized.','code'=>'AUTH_NOT_AUTHORIZED');
+    } elseif($post) {
+
+        $user=false;
+        $user['affiliate'] = preg_replace("/[^0-9]/", '' ,$_POST['affiliate']);
+        $user['nonce']     = preg_replace("/[^0-9]./", '',$_POST['nonce']);
+        $results_per_page  = preg_replace("/[^0-9]./", '',$_POST['limit']);
+        $results_per_page = empty($results_per_page) ? 30 : $results_per_page;
+
+        log_str("API->affiliates/subordinates \n".print_r($user,1));
+
+        API::add('Affiliates','getAffiliatesTotal30Days',array(0,1,0,$results_per_page));
+
+        API::apiKey($api_key1);
+        API::apiSignature($api_signature1,$params_json);
+        API::apiUpdateNonce();
+
+        $query = API::send($nonce1);
+        $return['affiliate-transactions'] = $query['Affiliates']['getAffiliatesTotal30Days']['results'][0];
+    } // method
+
+} elseif ($endpoint == 'affiliates/transactions') {
+
+    if ($invalid_signature || $invalid_currency || (!$api_key1) || ($nonce1 < 1) ) {
+		 $return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
+    } elseif ($permissions['p_affiliate'] != 'Y') {
+	     $return['errors'][] = array('message'=>'Not Authorized.','code'=>'AUTH_NOT_AUTHORIZED');
+    } elseif($post) {
+        $nonce1     = preg_replace("/[^0-9]./", '',$_POST['nonce']);
+
+        $return = array(
+             'invalid_sign' => $invalid_signature,
+             'invalid_currency' => $invalid_currency,
+             'api_key1' => $api_key1,
+             'nonce1' => $nonce1,
+             'permissions[p_affiliate]' => $permissions['p_affiliate'],
+             'params_json' =>json_decode( $params_json,1),
+        );
+
+        $results_per_page  = preg_replace("/[^0-9]./", '',$_POST['limit']);
+        $results_per_page = empty($results_per_page) ? 30 : $results_per_page;
+
+        API::add('Affiliates','get',array(false,0,$results_per_page,false,false,0,
+                    0,0,0,0,0,0,1));
+
+        $query = API::send();
+        API::apiKey($api_key1);
+        API::apiSignature($api_signature1,$params_json);
+        API::apiUpdateNonce();
+        
+        $query = API::send($nonce1);
+        $return['query'] = $query ;
+    } // post
 }
+
+
+
+
 
 if (!empty($return))
 	echo json_encode($return,JSON_NUMERIC_CHECK);
