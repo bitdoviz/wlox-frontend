@@ -192,7 +192,7 @@ include 'includes/head.php';
 						?>
 						<tr>
 							<td class="api-label first"><?= Lang::string('api-key') ?>:</td>
-							<td class="api-key" colspan="3"><?= $api_key['key'] ?></td>
+							<td class="api-key" colspan="5"><?= $api_key['key'] ?></td>
 							<td><a href="api-access.php?remove_id=<?= $api_key['id'] ?>&action=delete"><i class="fa fa-minus-circle"></i> <?= Lang::string('bank-accounts-remove') ?></a></td>
 						</tr>
 						<tr>
@@ -209,7 +209,14 @@ include 'includes/head.php';
 								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_view" name="permissions[<?= $api_key['id'] ?>][withdraw]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
 								<label for="permission_<?= $api_key['id'] ?>_withdraw"><?= Lang::string('api-permission_withdraw') ?></label>
 							</td>
-							<td class="inactive"></td>
+							<td class="inactive">
+								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_view" name="permissions[<?= $api_key['id'] ?>][affiliate]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<label for="permission_<?= $api_key['id'] ?>_affiliate"><?= Lang::string('api-permission_affiliate') ?></label>
+							</td>
+							<td class="inactive">
+								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_view" name="permissions[<?= $api_key['id'] ?>][merchant]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<label for="permission_<?= $api_key['id'] ?>_merchant"><?= Lang::string('api-permission_merchant') ?></label>
+							</td>
 						</tr>
 						<?
 							}
