@@ -184,7 +184,7 @@ include 'includes/head.php';
 		    	<div class="table-style">
 		    		<table class="table-list trades">
 						<tr>
-							<th colspan="5"><?= Lang::string('api-keys') ?></th>
+							<th colspan="6"><?= Lang::string('api-keys') ?></th>
 						</tr>
 						<? 
 						if ($api_keys) {
@@ -192,7 +192,7 @@ include 'includes/head.php';
 						?>
 						<tr>
 							<td class="api-label first"><?= Lang::string('api-key') ?>:</td>
-							<td class="api-key" colspan="5"><?= $api_key['key'] ?></td>
+							<td class="api-key" colspan="4"><?= $api_key['key'] ?></td>
 							<td><a href="api-access.php?remove_id=<?= $api_key['id'] ?>&action=delete"><i class="fa fa-minus-circle"></i> <?= Lang::string('bank-accounts-remove') ?></a></td>
 						</tr>
 						<tr>
@@ -206,23 +206,56 @@ include 'includes/head.php';
 								<label for="permission_<?= $api_key['id'] ?>_orders"><?= Lang::string('api-permission_orders') ?></label>
 							</td>
 							<td class="inactive">
-								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_view" name="permissions[<?= $api_key['id'] ?>][withdraw]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_withdraw" name="permissions[<?= $api_key['id'] ?>][withdraw]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
 								<label for="permission_<?= $api_key['id'] ?>_withdraw"><?= Lang::string('api-permission_withdraw') ?></label>
 							</td>
+							<? if (User::$info['is_affiliate'] == 'Y') { ?>
 							<td class="inactive">
-								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_view" name="permissions[<?= $api_key['id'] ?>][affiliate]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_affiliate" name="permissions[<?= $api_key['id'] ?>][affiliate]" value="Y" <?= ($api_key['affiliate'] == 'Y') ? 'checked="checked"' : '' ?> />
 								<label for="permission_<?= $api_key['id'] ?>_affiliate"><?= Lang::string('api-permission_affiliate') ?></label>
 							</td>
+							<? } else { ?>
+							<td class="inactive"></td>
+							<? } ?>
+							<? if (User::$info['is_merchant'] == 'Y') { ?>
 							<td class="inactive">
-								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_view" name="permissions[<?= $api_key['id'] ?>][merchant]" value="Y" <?= ($api_key['withdraw'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<input type="checkbox" class="show-merchant-options" id="permission_<?= $api_key['id'] ?>_merchant" name="permissions[<?= $api_key['id'] ?>][merchant]" value="Y" <?= ($api_key['merchant'] == 'Y') ? 'checked="checked"' : '' ?> />
 								<label for="permission_<?= $api_key['id'] ?>_merchant"><?= Lang::string('api-permission_merchant') ?></label>
+							</td>
+							<? } else { ?>
+							<td class="inactive"></td>
+							<? } ?>
+						</tr>
+						<tr <?= ($api_key['merchant'] != 'Y') ? 'style="display:none;"' : '' ?>>
+							<td class="api-label"><?= Lang::string('merchant-config') ?>:</td>
+							<td colspan="6">
+								<label for="permission_<?= $api_key['id'] ?>_merchant_url"><?= Lang::string('merchant-url') ?></label>
+								<input type="text" id="permission_<?= $api_key['id'] ?>_merchant_url" name="permissions[<?= $api_key['id'] ?>][merchant_url]" value="<?= $api_key['merchant_url'] ?>" />
+								<div style="height:20px;display:inline-block;width:5%;"></div>
+								<label for="permission_<?= $api_key['id'] ?>_merchant_currencies"><?= Lang::string('merchant-currencies') ?></label>
+								<input type="text" id="permission_<?= $api_key['id'] ?>_merchant_currencies" name="permissions[<?= $api_key['id'] ?>][merchant_currencies]" value="<?= $api_key['merchant_currencies'] ?>" placeholder="usd,btc,eur" />
+							</td>
+						</tr>
+						<tr <?= ($api_key['merchant'] != 'Y') ? 'style="display:none;"' : '' ?>>
+							<td class="api-label"></td>
+							<td colspan="2">
+								<label for="permission_<?= $api_key['id'] ?>_merchant_name"><?= Lang::string('merchant-name') ?></label>
+								<input type="text" id="permission_<?= $api_key['id'] ?>_merchant_name" name="permissions[<?= $api_key['id'] ?>][merchant_name]" value="<?= $api_key['merchant_name'] ?>" />
+							</td>
+							<td colspan="2">
+								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_test" name="permissions[<?= $api_key['id'] ?>][test]" value="Y"<?= ($api_key['test'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<label for="permission_<?= $api_key['id'] ?>_test"><?= Lang::string('api-permission_test') ?></label>
+							</td>
+							<td colspan="2">
+								<input type="checkbox" id="permission_<?= $api_key['id'] ?>_auto_conversion" name="permissions[<?= $api_key['id'] ?>][auto_conversion]" value="Y"<?= ($api_key['auto_conversion'] == 'Y') ? 'checked="checked"' : '' ?> />
+								<label for="permission_<?= $api_key['id'] ?>_auto_conversion"><?= Lang::string('api-permission_auto_conversion') ?></label>
 							</td>
 						</tr>
 						<?
 							}
 						}
 						else {
-							echo '<tr><td colspan="5">'.Lang::string('api-keys-no').'</td></tr>';
+							echo '<tr><td colspan="6">'.Lang::string('api-keys-no').'</td></tr>';
 						}
 						?>
 					</table>

@@ -2610,6 +2610,72 @@ function hideStickyMenu(show) {
 	}
 }
 
+function merchantDeposit() {
+	if ($('#amount_received').length == 0 || parseFloat($('#amount_received').val()) > 0)
+		return false;
+	
+	if (!window.merchant_crypto_received) {
+		window.merchant_crypto_received = setInterval(function () {
+			$.getJSON('includes/ajax.deposits.php?api_key='+$('#api_key').val()+'&c_currency='+$('#c_currency_merchant').val()+'&invoice_id='+$('#invoice_id').val(),function (data){
+				if (!data.received)
+					return false;
+				
+				if (parseFloat(data.received) == parseFloat($('#amount_received').val()))
+					return false;
+				
+				$('#amount_received').val(parseFloat(data.received));
+				$('#amount_received_dummy').html(formatCurrency(data.received,2,8)).parents('.calc').effect("highlight",{color:"#fff79a"},2000);
+				
+				if (!$('#merchant-login-flow .overlay').is(':visible')) {
+					$('#merchant-login-flow .overlay').fadeIn(400);
+					$('#c_currency_merchant').attr('disabled','disabled');
+				}
+				
+				var usd_amount = parseFloat($('#usd_amount').val());
+				if ((!usd_amount && parseFloat(data.received) > 0) || ((parseFloat(data.received) * parseFloat(data.currency_info.usd_ask)) >= usd_amount))
+					$('#merchant-crypto-finalized').fadeIn(400);
+					$('#merchant-checking-crypto').css('display','none');
+			});
+		},5000);
+	}
+	
+	$('#c_currency_merchant').unbind("keyup change").bind("keyup change", function(){
+		$('#merchant-cryptos-deposit').append('<div class="tp-loader"></div>');
+		$('#merchant-cryptos-deposit').load('merchant-deposit.php?action=switch-crypto&c_currency='+$(this).val()+'&api_key='+$('#api_key').val(),function(){
+			$('#merchant-cryptos-deposit').find('.top-loader').remove();
+			merchantDeposit();
+		});
+	});
+	
+	$('#merchant-login').off("submit").submit(function(e){
+		e.preventDefault();
+		$('#merchant-login-flow').append('<div class="tp-loader"></div>');
+		$('#merchant-login-flow').load('merchant-deposit.php?action=login&api_key='+$('#api_key').val()+'&'+$(this).serialize(),function(){
+			$('#merchant-login-flow').find('.top-loader').remove();
+			merchantDeposit();
+		});
+	});
+	
+	$('#enable_tfa').off("submit").submit(function(e){
+		e.preventDefault();
+		$('#merchant-login-flow').append('<div class="tp-loader"></div>');
+		$('#merchant-login-flow').load('verify-token.php?bypass=deposit&api_key='+$('#api_key').val()+'&'+$(this).serialize(),function(){
+			$('#merchant-login-flow').find('.top-loader').remove();
+			merchantDeposit();
+		});
+	});
+	
+	$('#merchant-crypto-finalized').off("click").click(function(e){
+		e.preventDefault();
+		$('.merchant-processing-final').css('display','block');
+		setTimeout(function(){
+			$.getJSON('includes/merchant-deposit.php?action=process&process=crypto&api_key='+$('#api_key').val()+'&c_currency='+$('#c_currency_merchant').val()+'&address='+$('#deposit_address').val(),function (data){
+				
+			});
+		},5000);
+	});
+}
+
 $(document).ready(function() {
 	if ($("#graph_price_history_currency").length > 0) {
 		startTicker();
@@ -2737,17 +2803,28 @@ $(document).ready(function() {
         return false;
     });
     
+    $('.show-merchant-options').bind("click", function(){
+		if ($(this).is(':checked')) {
+			$(this).parents('tr').next('tr').show('200');
+		}
+		else {
+			$(this).parents('tr').next('tr').hide('200');
+		}
+	});
+    
     selectnav('tiny', {
 		label: '--- Navigation --- ',
 		indent: '-'
 	});
 	
-    ddsmoothmenu.init({
-    	mainmenuid: "menu",
-    	orientation: 'h',
-    	classname: 'menu',
-    	contentsource: "markup"
-    })
+    if ($('#amount_received').length == 0) {
+	    ddsmoothmenu.init({
+	    	mainmenuid: "menu",
+	    	orientation: 'h',
+	    	classname: 'menu',
+	    	contentsource: "markup"
+	    });
+    }
     
 	filtersUpdate();
 	paginationUpdate();
@@ -2762,6 +2839,7 @@ $(document).ready(function() {
 	updateTransactionsList();
 	//timeUntil();
 	blink();
+	merchantDeposit();
 });
 
 (function() {

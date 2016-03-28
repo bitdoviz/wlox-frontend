@@ -94,14 +94,19 @@
 
 <a href="#" class="scrollup">Scroll</a><!-- end scroll to top of the page-->
 
+<? if ($CFG->self != 'merchant-deposit.php' && $CFG->self != 'merchant-widthdraw.php') { ?>
 <? include 'includes/chat.php'; ?>
+<? } ?>
 </div>
 
 <!-- ######### JS FILES ######### -->
 <script type="text/javascript" src="js/socket.io.js"></script>
 <script type="text/javascript" src="js/universal/jquery.js"></script>
 <script type="text/javascript" src="js/universal/jquery-ui-1.10.3.custom.min.js"></script>
+
+<? if ($CFG->self != 'merchant-deposit.php' && $CFG->self != 'merchant-widthdraw.php') { ?>
 <script type="text/javascript" src="js/chat.js?v=20160112"></script>
+<? } ?>
 
 <!-- main js -->
 <script type="text/javascript" src="js/ops.js?v=20160128"></script>

@@ -104,6 +104,14 @@ class API{
 		else
 			return $ip_addresses[0];
 	}
+	
+	static public function getReferrerDomain($referrer=false) {
+		if (!$referrer)
+			return false;
+		
+		$parts = parse_url($referrer);
+		return $parts['host'];
+	}
 }
 
 ?>

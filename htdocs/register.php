@@ -37,7 +37,7 @@ if (!empty($_REQUEST['register']) && (is_array($register->errors))) {
 	if ($register->errors) {
 		foreach ($register->errors as $key => $error) {
 			if (stristr($error,'login-required-error')) {
-				$errors[] = Lang::string('settings-'.str_replace('_','-',$key)).' '.Lang::string('login-required-error');
+				$errors[] = ((Lang::string('settings-'.str_replace('dev-','',str_replace('_','-',$key)))) ? Lang::string('settings-'.str_replace('dev-','',str_replace('_','-',$key))) : Lang::string(str_replace('dev-','',str_replace('_','-',$key)))).' '.Lang::string('login-required-error');
 			}
 			elseif (strstr($error,'-')) {
 				$errors[] = Lang::string($error);

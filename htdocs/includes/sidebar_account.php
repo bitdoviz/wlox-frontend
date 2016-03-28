@@ -5,16 +5,15 @@
 			<li><a href="account.php" <?= ($CFG->self == 'account.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('account') ?></a></li>
 			<li><a href="open-orders.php" <?= ($CFG->self == 'open-orders.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('open-orders') ?></a></li>
 			<li><a href="transactions.php" <?= ($CFG->self == 'transactions.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('transactions') ?></a></li>
-			<? if (User::$info['shares_enabled']) {?>
-			<li><a href="shares.php" <?= ($CFG->self == 'shares.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('shares') ?></a></li>
-			<? } ?>
 			<li><a href="security.php" <?= ($CFG->self == 'security.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('security') ?></a></li>
 			<li><a href="settings.php" <?= ($CFG->self == 'settings.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('settings') ?></a></li>
 			<li><a href="bank-accounts.php" <?= ($CFG->self == 'bank-accounts.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('bank-accounts') ?></a></li>
 			<li><a href="bitcoin-addresses.php" <?= ($CFG->self == 'bitcoin-addresses.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('bitcoin-addresses') ?></a></li>
 			<li><a href="history.php" <?= ($CFG->self == 'history.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('history') ?></a></li>
 			<li><a href="api-access.php" <?= ($CFG->self == 'api-access.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('api-access') ?></a></li>
+			<? if (User::$info['is_affiliate'] == 'Y') { ?>
 			<li><a href="affiliate_info.php" <?= ($CFG->self == 'affiliate_info.php') ? 'class="active"' : '' ?>><i class="fa fa-angle-right"></i> <?= Lang::string('affiliate-info') ?></a></li>
+			<? } ?>
 			<li><a href="logout.php?log_out=1&uniq=<?= $_SESSION["logout_uniq"] ?>"><i class="fa fa-angle-right"></i> <?= Lang::string('log-out') ?></a></li>
 		</ul>
 	</div>

@@ -96,7 +96,7 @@
    
 <!-- HEADER -->
 <header id="header">
-
+	<? if ($CFG->self != 'merchant-deposit.php' && $CFG->self != 'merchant-widthdraw.php') { ?>
 	<!-- Top header bar -->
 	<div id="topHeader">
     
@@ -110,8 +110,6 @@
                 <li><a href="help.php"><?= Lang::string('help') ?></a></li>
                 <li>|</li>
                 <li><a href="<?= Lang::url('contact.php') ?>"><?= Lang::string('contact') ?></a></li>
-                <li>|</li>
-                <li><a target="_blank" href="https://github.com/mbassan/wlox/"><i class="fa fa-github"></i> GitHub</a></li>
             </ul>
         
             <ul class="tci_list">
@@ -200,5 +198,26 @@
 	</div>
     <div class="bg"></div>
 	</div>
+    <? } else { ?>
+    <div id="trueHeader">
     
-</header><!-- end header -->
+	<div class="wrapper">
+    
+     <div class="container">
+    
+		<!-- Logo -->
+		<div class="one_fourth"><a href="index.php" id="logo"></a></div>
+		
+        <!-- Menu -->
+        <div class="three_fourth last">
+			<nav id="access" class="access" role="navigation">
+				<div id="menu" class="menu"></div>
+           	</nav>
+        </div>
+		</div>
+		
+	</div>
+    <div class="bg"></div>
+	</div>
+    <? } ?>
+</header>

@@ -6,9 +6,11 @@ if (User::isLoggedIn())
 elseif (!User::$awaiting_token)
 	Link::redirect('login.php');
 
+$bypass = (!empty($_REQUEST['bypass'])) ? preg_replace("/[^0-9a-zA-Z\-]/","",$_REQUEST['bypass']) : false;
 $token1 = (!empty($_REQUEST['token'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['token']) : false;
 $dont_ask1 = !empty($_REQUEST['dont_ask']);
 $authcode1 = (!empty($_REQUEST['authcode'])) ? urldecode($_REQUEST['authcode']) : false;
+$api_key = (!empty($_REQUEST['api_key'])) ? preg_replace("/[^0-9a-zA-Z]/","",$_REQUEST['api_key']) : false;
 
 if (!empty($_REQUEST['step']) && $_REQUEST['step'] == 1) {
 	if (!($token1 > 0))
@@ -19,7 +21,11 @@ if (!empty($_REQUEST['step']) && $_REQUEST['step'] == 1) {
 		if ($verify) {
 			if (!empty($_REQUEST['email_auth']))
 				Link::redirect('change-password.php?authcode='.urlencode($_REQUEST['authcode']));
-			else
+			else if ($bypass == 'deposit')
+				Link::redirect('merchant-deposit.php?api_key='.$api_key.'&action=logged-in');
+			else if ($bypass == 'withdraw')
+				Link::redirect('merchant-withdraw.php?api_key='.$api_key.'&action=logged-in');
+			else 
 				Link::redirect('account.php');
 			exit;
 		}
@@ -32,7 +38,8 @@ $query = API::send();
 $content = $query['Content']['getRecord']['results'][0];
 $page_title = Lang::string('verify-token');
 
-include 'includes/head.php';
+if (!$bypass) {
+	include 'includes/head.php';
 ?>
 <div class="page_title">
 	<div class="container">
@@ -47,11 +54,13 @@ include 'includes/head.php';
 			<div class="text"><?= $content['content'] ?></div>
 			<div class="mar_top2"></div>
 			<div class="clear"></div>
+			<? } ?>
 			<? Errors::display(); ?>
 			<form id="enable_tfa" action="verify-token.php" method="POST">
 				<input type="hidden" name="step" value="1" />
 				<input type="hidden" name="email_auth" value="<?= !empty($_REQUEST['email_auth']) ?>" />
 				<input type="hidden" name="authcode" value="<?= urlencode($authcode1) ?>" />
+				<input type="hidden" name="bypass" value="<?= $bypass ?>" />
 				<div class="buyform">
 					<div class="content">
 		            	<h3 class="section_label">
@@ -81,8 +90,10 @@ include 'includes/head.php';
 		            </div>
 	            </div>
             </form>
+            <? if (!$bypass) { ?>
 		</div>
 	</div>
 	<div class="mar_top8"></div>
 </div>
-<? include 'includes/foot.php'; ?>
+<? include 'includes/foot.php'; 
+}?>
