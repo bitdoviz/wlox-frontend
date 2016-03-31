@@ -788,8 +788,6 @@ elseif ($endpoint == 'withdrawals/new') {
 			$return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
 	}
 } elseif ($endpoint == 'affiliates/new-user') {
-
-
     if ($invalid_signature || !$invalid_currency || $api_key1 || ($nonce1 < 1) ) {
 		 $return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
     } elseif ($permissions['affiliates'] != 'Y') {
@@ -799,12 +797,9 @@ elseif ($endpoint == 'withdrawals/new') {
         $user=false;
         $user['affiliate'] = preg_replace("/[^0-9]/", '',$_POST['affiliate']);
         $user['nonce'] = preg_replace("/[^0-9]./", '',$_POST['nonce']);
-
         $user['cut'] = (!empty($_POST['cut']) && $_POST['cut'] > 0) ? number_format(preg_replace("/[^0-9.]/", "",$_POST['cut']),8,'.','') : false;
-
         $user['email'] = (!empty($_REQUEST['email'])) ? preg_replace("/[^0-9a-zA-Z@\.\!#\$%\&\*+_\~\?\-]/", "",$_REQUEST['email']) : false;
         $user['default_currency'] = (!empty($_REQUEST['default_currency'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['default_currency']) : false;
-
         $user['first_name'] = preg_replace("/[^\pL a-zA-Z0-9@\s\._-]/u", "",$_POST['first_name']);
         $user['last_name']  = preg_replace("/[^\pL a-zA-Z0-9@\s\._-]/u", "",$_POST['last_name']);
         $user['country']    = preg_replace("/[^0-9]/", "",$_POST['country']);
@@ -858,9 +853,6 @@ elseif ($endpoint == 'withdrawals/new') {
         $user['affiliate'] = preg_replace("/[^0-9]/", '',$_POST['affiliate']);
         $user['nonce'] = preg_replace("/[^0-9]./", '',$_POST['nonce']);
 
-        log_str("voy a enviar el overview ".print_r($user,1));
-
-
         API::add('Affiliates','getOverview',array());
         API::apiKey($api_key1);
         API::apiSignature($api_signature1,$params_json);
@@ -889,10 +881,7 @@ elseif ($endpoint == 'withdrawals/new') {
         $results_per_page  = preg_replace("/[^0-9]./", '',$_POST['limit']);
         $results_per_page = empty($results_per_page) ? 30 : $results_per_page;
 
-        log_str("API->affiliates/subordinates \n".print_r($user,1));
-
         API::add('Affiliates','getAffiliatesTotal30Days',array(0,1,0,$results_per_page));
-
         API::apiKey($api_key1);
         API::apiSignature($api_signature1,$params_json);
         API::apiUpdateNonce();
@@ -934,7 +923,37 @@ elseif ($endpoint == 'withdrawals/new') {
         $return['query'] = $query ;
     } // post
 }
-
+elseif ($endpoint == 'merchant/check-invoice') {
+	if ($post) {
+		if (!$invalid_signature && $api_key1 && $nonce1 > 0) {
+			if ($permissions['p_view'] == 'Y') {
+				$invoice_id = (!empty($_POST['invoice_id'])) ? preg_replace("/[^0-9a-zA-Z]/","",$_POST['invoice_id']) : false;
+				
+				API::add('APIKeys','getInvoice',array($invoice_id));
+				API::apiKey($api_key1);
+				API::apiSignature($api_signature1,$params_json);
+				API::apiUpdateNonce();
+				$query = API::send($nonce1);
+	
+	
+				if (empty($query['error'])) {
+					if ($query['APIKeys']['getInvoice']['results'][0])
+						$return['check-invoice'] = $query['APIKeys']['getInvoice']['results'][0];
+					else 
+						$return['errors'][] = array('message'=>'Invoice not found.','code'=>'MERCHANT_INVOICE_NOT_FOUND');
+				}
+				else
+					$return['errors'][] = array('message'=>'Invalid authentication.','code'=>$query['error']);
+			}
+			else
+				$return['errors'][] = array('message'=>'Not authorized.','code'=>'AUTH_NOT_AUTHORIZED');
+		}
+		elseif (!$invalid_signature)
+		$return['errors'][] = array('message'=>'Invalid authentication.','code'=>'AUTH_ERROR');
+	}
+	else
+		$return['errors'][] = array('message'=>'Invalid HTTP method.','code'=>'AUTH_INVALID_HTTP_METHOD');
+}
 
 
 

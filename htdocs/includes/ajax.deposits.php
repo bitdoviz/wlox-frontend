@@ -5,12 +5,12 @@ $ajax = true;
 include '../lib/common.php';
 
 $c_currency = (!empty($CFG->currencies[strtoupper($_REQUEST['c_currency'])])) ? $_REQUEST['c_currency'] : false;
-$invoice_id = (!empty($_REQUEST['invoice_id'])) ?  preg_replace("/[^\0-9a-zA-Z]/", "",$_REQUEST['invoice_id']) : false;
+$invoice_id = (!empty($_REQUEST['invoice_id'])) ?  preg_replace("/[^0-9a-zA-Z]/", "",$_REQUEST['invoice_id']) : false;
 
-if (!$c_currency || strlen($api_key) != 16)
+if (!$c_currency || !$invoice_id)
 	exit;
 
-API::add('Requests','get',array(false,false,false,false,$c_currency,false,false,false,$address,$invoice_id));
+API::add('Requests','get',array(false,false,false,false,$c_currency,false,false,false,$invoice_id));
 $query = API::send();
 $deposits = $query['Requests']['get']['results'][0];
 $received = 0;

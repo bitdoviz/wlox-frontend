@@ -1,6 +1,6 @@
 <?php
 include '../lib/common.php';
- 
+
 // first session values
 $action = $_REQUEST['action'];
 if (!$action) {
@@ -24,6 +24,9 @@ else {
 		$_SESSION['c_currency'] = $_REQUEST['c_currency'];
 }
 
+$_SESSION['api_currency'] = false;
+$_SESSION['api_amount'] = false;
+
 $invoice_id = (!empty($_SESSION['invoice_id'])) ? preg_replace("/[^0-9a-zA-Z]/","",$_SESSION['invoice_id']) : false;
 $api_key = (!empty($_REQUEST['api_key'])) ? preg_replace("/[^0-9a-zA-Z]/","",$_REQUEST['api_key']) : false;
 $api_amount = (!empty($_SESSION['api_amount'])) ? preg_replace("/[^0-9]/","",$_SESSION['api_amount']) : false;
@@ -37,6 +40,7 @@ $usd_amount = (is_numeric($api_amount) && !empty($CFG->currencies[$api_currency]
 $exit = false;
 $merchant_info = false;
 $allowed_currencies = array();
+$select_currencies = $CFG->currencies;
 
 // check if merchant and referrer are valid
 if (!$api_key || strlen($api_key) != 16) {
@@ -49,11 +53,9 @@ else {
 	
 	if (!$merchant_info)
 		$exit = true;
-	/*
-	 * DEBUG
+
 	if (!$action && API::getReferrerDomain($merchant_info['merchant_url']) != API::getReferrerDomain($_SERVER['HTTP_REFERER']))
 		$exit;
-	*/
 }
 
 if ($exit)
@@ -86,6 +88,15 @@ if (is_array($merchant_currencies)) {
 			$c_currency = ($pref_c_currency) ? $pref_c_currency : $pref_currency;
 		if (!in_array($currency,$allowed_currencies))
 			$currency = ($pref_currency) ? $pref_currency : $pref_c_currency;
+		
+		// sort currencies by merchant's priority
+		$currencies1 = array();
+		foreach ($allowed_currencies as $currency1) {
+			$k = $select_currencies[$currency1]['currency'];
+			$currencies1[$k] = $select_currencies[$currency1];
+			unset($select_currencies[$currency1]);
+		}
+		$select_currencies = array_merge($currencies1,$select_currencies);
 	}
 }
 
@@ -97,12 +108,10 @@ if (!$action) {
 	
 if (!$action || $action == 'switch-crypto') {
 	if (empty($_SESSION['deposit_addresses'][$c_currency])) {
-		//API::add('BitcoinAddresses', 'getNew',array($c_currency,true,$api_key,$invoice_id));
-		//$result = API::send();
-		/* DEBUG
+		API::add('BitcoinAddresses', 'getNew',array($c_currency,true,$api_key,$invoice_id));
+		$result = API::send();
+
 		$address = $result['BitcoinAddresses']['getNew']['results'][0];
-		*/
-		$address = 'LgG6oS1weBWjxafRLBi565P4T9dt4jgeaQ';
 		$_SESSION['deposit_address'] = $address;
 		$_SESSION['deposit_addresses'][$c_currency] = $address;
 	}
@@ -141,7 +150,7 @@ else if ($action == 'login') {
 			}
 			elseif (!empty($login['message']) && $login['message'] == 'logged-in') {
 				$_SESSION["register_uniq"] = md5(uniqid(mt_rand(),true));
-				Link::redirect('merchant-deposit.php?action=logged-in');
+				Link::redirect('merchant-deposit.php?action=logged-in&bypass=deposit&api_key='.$api_key);
 			}
 		}
 		elseif (!$login || !empty($login['error'])) {
@@ -150,26 +159,15 @@ else if ($action == 'login') {
 	}
 }
 else if ($action == 'process') {
-	if ($_REQUEST['process'] == 'crypto') {
-		$address = (!empty($_REQUEST['address'])) ?  preg_replace("/[^\da-z]/i", "",$_REQUEST['address']) : false;
-		if (!$c_currency || strlen($api_key) != 16)
-			exit;
+	$type = (!empty($_REQUEST['process'])) ? preg_replace("/[^a-z]/", "",$_REQUEST['process']) : false;
+	$amount_payed = (!empty($_REQUEST['amount_payed'])) ? preg_replace("/[^0-9\.]/", "",$_REQUEST['amount_payed']) : false;
+	$currency_payed = (!empty($_REQUEST['currency_payed'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['currency_payed']) : false;
+
+	if (!$invoice_id)
+		exit;
 		
-		API::add('Requests','get',array(false,false,false,false,$c_currency,false,false,false,$address,$api_key));
-		$query = API::send();
-		$deposits = $query['Requests']['get']['results'][0];
-		$received = 0;
-		
-		if ($deposits) {
-			foreach ($deposits as $deposit) {
-				$received += $deposit['amount'];
-			}
-		}
-		
-		if ($received > 0) {
-			
-		}
-	}
+	API::add('APIKeys','updateInvoice',array($invoice_id,$api_key,$type,$amount_payed,$currency_payed));
+	$query = API::send();
 }
 
 if ($action == 'logged-in' || User::isLoggedIn()) {
@@ -198,6 +196,7 @@ if (!$action) {
 <input type="hidden" id="api_key" value="<?= $api_key ?>" />
 <input type="hidden" id="usd_amount" value="<?= $usd_amount ?>" />
 <input type="hidden" id="invoice_id" value="<?= $invoice_id ?>" />
+<input type="hidden" id="merchant_url" value="<?= $merchant_info['url'] ?>" />
 <div class="fresh_projects login_bg">
 	<div class="clearfix mar_top8"></div>
     <div class="container" id="container">
@@ -220,9 +219,13 @@ if (!$action) {
 						<input type="hidden" id="c_curency_abbr" value="<?= $c_currency_info['fa_symbol'] ?>" />
 						<div class="spacer"></div>
 						<? if ($api_amount) { ?>
+						<div class="spacer"></div>
+						<div class="calc price-red">
+							<?= Lang::string('merchant-exact-warn') ?>
+						</div>
 						<div class="param">
 							<label for="crypto_amount"><?= Lang::string('gateway-amount') ?></label>
-							<input type="text" id="crypto_amount" name="crypto_amount" readonly="readonly" value="<?= String::currency($usd_amount/$c_currency_info['usd_ask'],2,8).' '.$c_currency_info['fa_symbol'] ?>" />
+							<input type="text" id="crypto_amount" name="crypto_amount" readonly="readonly" value="<?= String::currency(Currencies::convertTo($api_amount,$api_currency,$c_currency_info['id'],'up'),2,8).' '.$c_currency_info['fa_symbol'] ?>" />
 							<div class="clear"></div>
 						</div>
 						<? } ?>
@@ -230,8 +233,8 @@ if (!$action) {
 							<label for="c_currency_merchant"><?= Lang::string('deposit-c-currency') ?></label>
 							<select id="c_currency_merchant" name="c_currency">
 							<?
-							if ($CFG->currencies) {
-								foreach ($CFG->currencies as $key => $currency) {
+							if ($select_currencies) {
+								foreach ($select_currencies as $key => $currency) {
 									if (is_numeric($key) || $currency['is_crypto'] != 'Y' || ($allowed_currencies && !in_array($currency['id'],$allowed_currencies)))
 										continue;
 									
@@ -281,7 +284,7 @@ if (!$action) {
 						<div class="calc bigger dotted-over">
 							<input type="hidden" id="amount_received" value="0" />
 							<div class="label"><?= Lang::string('merchant-received') ?></div>
-							<div class="value"><span id="amount_received_dummy">0</span> / <?= String::currency($usd_amount/$c_currency_info['usd_ask'],2,8) ?> <?= $c_currency_info['fa_symbol'] ?></div>
+							<div class="value"><span id="amount_received_dummy">0</span> / <?= String::currency(Currencies::convertTo($api_amount,$api_currency,$c_currency_info['id'],'up'),2,8) ?> <?= $c_currency_info['fa_symbol'] ?></div>
 							<div class="clear"></div>
 						</div>
 						<div class="spacer"></div>
@@ -358,15 +361,15 @@ if (!$action) {
 	            	</div>
 	            	<form method="POST" action="merchant-deposit.php" name="user-payment" id="merchant-user-payment" class="buyform">
 						<div class="param">
-							<label for="user_pay_currency"><?= Lang::string('gateway-currency-pay') ?></label>
-							<select id="user_pay_currency" name="user_pay_currency">
+							<label for="merchant-user-pay-currency"><?= Lang::string('gateway-currency-pay') ?></label>
+							<select id="merchant-user-pay-currency" name="user_pay_currency">
 							<?
-							if ($CFG->currencies) {
-								foreach ($CFG->currencies as $key => $currency) {
-									if (is_numeric($key) || $currency['is_crypto'] != 'Y' || ($allowed_currencies && !in_array($currency['id'],$allowed_currencies)))
+							if ($select_currencies) {
+								foreach ($select_currencies as $key => $currency) {
+									if (is_numeric($key) || ($allowed_currencies && !in_array($currency['id'],$allowed_currencies)))
 										continue;
 									
-									echo '<option '.(($currency['id'] == $c_currency) ? 'selected="selected"' : '').' value="'.$currency['id'].'">'.$currency['currency'].'</option>';
+									echo '<option '.(($currency['id'] == $currency_info['id']) ? 'selected="selected"' : '').' value="'.$currency['id'].'">'.$currency['currency'].'</option>';
 								}
 							}	
 							?>
@@ -375,23 +378,23 @@ if (!$action) {
 						</div>
 						<? if ($api_amount) { ?>
 						<div class="param dotted-over">
-							<label for="user_pay_amount"><?= Lang::string('gateway-amount-pay') ?></label>
-							<input type="text" id="user_pay_amount" name="user_pay_amount" readonly="readonly" value="<?= String::currency($usd_amount/$c_currency_info['usd_ask'],2,8).' '.$c_currency_info['fa_symbol'] ?>" />
+							<label for="merchant-user-pay-amount"><?= Lang::string('gateway-amount-pay') ?></label>
+							<input type="text" id="merchant-user-pay-amount" name="user_pay_amount" readonly="readonly" value="<?= String::currencyOutput(Currencies::convertTo($api_amount,$api_currency,$currency_info['id'],'up'),2,8) ?>" />
 							<div class="clear"></div>
 						</div>
 						<? } else { ?>
 						<div class="param">
-							<label for="user_pay_amount"><?= Lang::string('gateway-amount') ?></label>
-							<input type="text" id="user_pay_amount" name="user_pay_amount" readonly="readonly" value="" />
+							<label for="merchant-user-pay-amount"><?= Lang::string('gateway-amount') ?></label>
+							<input type="text" id="merchant-user-pay-amount" name="user_pay_amount" value="" />
 							<div class="clear"></div>
 						</div>
 						<? } ?>
-						<div class="calc bigger dotted-over" <?= ($usd_amount > 0 && ($usd_amount/$currency_info['usd_ask']) > $available[$currency_info['currency']]) ? '' : 'style="display:none;"' ?>>
+						<div class="calc bigger dotted-over" <?= ($usd_amount > 0 && Currencies::convertTo($api_amount,$api_currency,$currency_info['id'],'up') > $available[$currency_info['currency']]) ? '' : 'style="display:none;"' ?>>
 							<div class="label price-red"><?= Lang::string('merchant-insufficient-balance') ?></div>
 							<div class="clear"></div>
 						</div>
 						<div class="mar_top2"></div>
-						<ul class="list_empty" <?= ($usd_amount > 0 && ($usd_amount/$currency_info['usd_ask']) > $available[$currency_info['currency']]) ? 'style="display:none;"' : '' ?>>
+						<ul class="list_empty" <?= ($usd_amount > 0 && Currencies::convertTo($api_amount,$api_currency,$currency_info['id'],'up') > $available[$currency_info['currency']]) ? 'style="display:none;"' : '' ?>>
 							<li><input type="submit" name="submit" value="<?= Lang::string('merchant-finalize') ?>" class="but_user" /></li>
 						</ul>
 	            	</form>

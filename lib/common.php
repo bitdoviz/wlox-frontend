@@ -107,4 +107,6 @@ $CFG->currencies = $query['Currencies']['get']['results'][0];
 /* Format Defaults */
 $CFG->decimal_separator = (!$CFG->decimal_separator) ? '.' : $CFG->decimal_separator;
 $CFG->thousands_separator = (!$CFG->thousands_separator) ? ',' : $CFG->thousands_separator;
+$CFG->currency_conversion_fee = $CFG->currency_conversion_fee * 0.01;
+$CFG->merchant_commision = $CFG->merchant_commision * 0.01;
 ?>

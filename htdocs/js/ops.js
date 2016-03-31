@@ -2624,7 +2624,7 @@ function merchantDeposit() {
 					return false;
 				
 				$('#amount_received').val(parseFloat(data.received));
-				$('#amount_received_dummy').html(formatCurrency(data.received,2,8)).parents('.calc').effect("highlight",{color:"#fff79a"},2000);
+				$('#amount_received_dummy').html(formatCurrency(data.received,8)).parents('.calc').effect("highlight",{color:"#fff79a"},2000);
 				
 				if (!$('#merchant-login-flow .overlay').is(':visible')) {
 					$('#merchant-login-flow .overlay').fadeIn(400);
@@ -2643,6 +2643,14 @@ function merchantDeposit() {
 		$('#merchant-cryptos-deposit').append('<div class="tp-loader"></div>');
 		$('#merchant-cryptos-deposit').load('merchant-deposit.php?action=switch-crypto&c_currency='+$(this).val()+'&api_key='+$('#api_key').val(),function(){
 			$('#merchant-cryptos-deposit').find('.top-loader').remove();
+			merchantDeposit();
+		});
+	});
+	
+	$('#merchant-user-pay-currency').unbind("keyup change").bind("keyup change", function(){
+		$('#merchant-login-flow').append('<div class="tp-loader"></div>');
+		$('#merchant-login-flow').load('merchant-deposit.php?action=logged-in&currency='+$(this).val()+'&api_key='+$('#api_key').val(),function(){
+			$('#merchant-login-flow').find('.top-loader').remove();
 			merchantDeposit();
 		});
 	});
@@ -2668,10 +2676,20 @@ function merchantDeposit() {
 	$('#merchant-crypto-finalized').off("click").click(function(e){
 		e.preventDefault();
 		$('.merchant-processing-final').css('display','block');
+		$.getJSON('merchant-deposit.php?action=process&process=crypto&api_key='+$('#api_key').val()+'&c_currency='+$('#c_currency_merchant').val()+'&address='+$('#deposit_address').val()+'&currency_payed='+$('#c_currency_merchant').val());
+		
 		setTimeout(function(){
-			$.getJSON('includes/merchant-deposit.php?action=process&process=crypto&api_key='+$('#api_key').val()+'&c_currency='+$('#c_currency_merchant').val()+'&address='+$('#deposit_address').val(),function (data){
-				
-			});
+			window.location = $('#merchant_url').val()+'?api_key='+$('#api_key').val()+'&invoice_id='+$('#invoice_id').val();
+		},5000);
+	});
+	
+	$('#merchant-user-payment').off("submit").submit(function(e){
+		e.preventDefault();
+		$('.merchant-processing-final').css('display','block');
+		$.getJSON('merchant-deposit.php?action=process&process=account&api_key='+$('#api_key').val()+'&currency_payed='+$('#merchant-user-pay-currency').val()+'&amount_payed='+$('#merchant-user-pay-amount').val());
+		
+		setTimeout(function(){
+			window.location = $('#merchant_url').val()+'?api_key='+$('#api_key').val()+'&invoice_id='+$('#invoice_id').val();
 		},5000);
 	});
 }
