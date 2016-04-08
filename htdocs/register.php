@@ -5,6 +5,7 @@ include '../lib/common.php';
 //$_REQUEST['register']['last_name'] = (!empty($_REQUEST['register']['last_name'])) ? preg_replace("/[^\pL a-zA-Z0-9@\s\._-]/u", "",$_REQUEST['register']['last_name']) : false;
 $_REQUEST['register']['country'] = (!empty($_REQUEST['register']['country'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['register']['country']) : false;
 $_REQUEST['register']['email'] = (!empty($_REQUEST['register']['email'])) ? preg_replace("/[^0-9a-zA-Z@\.\!#\$%\&\*+_\~\?\-]/", "",$_REQUEST['register']['email']) : false;
+$_REQUEST['register']['default_c_currency'] = (!empty($_REQUEST['register']['default_c_currency'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['register']['default_c_currency']) : false;
 $_REQUEST['register']['default_currency'] = (!empty($_REQUEST['register']['default_currency'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['register']['default_currency']) : false;
 
 if (empty($CFG->google_recaptch_api_key) || empty($CFG->google_recaptch_api_secret))
@@ -111,8 +112,8 @@ include 'includes/head.php';
                 //$register->textInput('last_name',Lang::string('settings-last-name'),false);
                 //$register->selectInput('country',Lang::string('settings-country'),false,false,$countries,false,array('name'));
                 $register->textInput('email',Lang::string('settings-email'),'email');
-                $register->selectInput('default_c_currency',Lang::string('default-c-currency'),1,false,$currencies_list1,false,array('currency'));
-                $register->selectInput('default_currency',Lang::string('default-currency'),1,false,$currencies_list,false,array('currency'));
+                $register->selectInput('default_c_currency',Lang::string('default-c-currency'),1,$CFG->currencies['BTC']['id'],$currencies_list1,false,array('currency'));
+                $register->selectInput('default_currency',Lang::string('default-currency'),1,$CFG->currencies['TRY']['id'],$currencies_list,false,array('currency'));
                 $register->checkBox('terms',Lang::string('settings-terms-accept'),false,false,false,false,false,false,'checkbox_label');
                 $register->captcha(Lang::string('settings-capcha'));
                 $register->HTML('<div class="form_button"><input type="submit" name="submit" value="'.Lang::string('home-register').'" class="but_user" /></div>');

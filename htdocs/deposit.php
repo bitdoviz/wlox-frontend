@@ -8,6 +8,19 @@ elseif (User::$awaiting_token)
 elseif (!User::isLoggedIn())
 	Link::redirect('login.php');
 
+$action = (!empty($_REQUEST['action'])) ? $_REQUEST['action'] : false;
+$invoice_id = (!empty($_REQUEST['invoice_id'])) ? preg_replace("/[^0-9a-zA-Z]/", "",$_REQUEST['invoice_id']) : false;
+
+if ($action == 'complete') {
+	
+}
+else if ($action == 'notify') {
+	
+}
+else if ($action == 'cancel') {
+	
+}
+
 $page1 = (!empty($_REQUEST['page'])) ? preg_replace("/[^0-9]/", "",$_REQUEST['page']) : false;
 $currencies = Settings::sessionCurrency();
 
@@ -37,7 +50,7 @@ if ($gateways) {
 
 $ask_confirm = false;
 $passed_uniq = false;
-$confirmed = (!empty($_REQUEST['confirmed'])) ? $_REQUEST['confirmed'] : false;;
+$confirmed = (!empty($_REQUEST['confirmed'])) ? $_REQUEST['confirmed'] : false;
 $gateway_type1 = false;
 $gateway_currency1 = $currencies['currency'];
 $gateway_amount1 = false;
@@ -89,18 +102,48 @@ if ($_REQUEST['gateway_type']) {
 	$gateway_bank_city1 = preg_replace("/[^\pL a-zA-Z0-9@\s\._- ]/u","",$_REQUEST['gateway_bank_city']);
 	$gateway_bank_country1 = preg_replace("/[^0-9]/","",$_REQUEST['gateway_bank_country']);
 	
+	$info = array();
+	$info['gateway_type'] = $gateway_type1;
+	$info['gateway_currency'] = $gateway_currency1;
+	$info['gateway_amount'] = $gateway_amount1;
+	$info['card_type'] = $card_type1;
+	$info['card_name'] = $card_name1;
+	$info['card_number'] = $card_number1;
+	$info['card_expiration_month'] = $card_expiration_month1;
+	$info['card_expiration_year'] = $card_expiration_year1;
+	$info['card_cvv'] = $card_cvv1;
+	$info['card_email'] = $card_email1;
+	$info['card_phone'] = $card_phone1;
+	$info['card_address1'] = $card_address11;
+	$info['card_address2'] = $card_address21;
+	$info['card_city'] = $card_city1;
+	$info['card_state'] = $card_state1;
+	$info['card_country'] = $card_country1;
+	$info['card_zip'] = $card_zip1;
+	$info['gateway_id'] = $gateway_id1;
+	$info['gateway_user'] = $gateway_user1;
+	$info['gateway_pass'] = $gateway_pass1;
+	$info['gateway_bank_account'] = $gateway_bank_account1;
+	$info['gateway_bank_iban'] = $gateway_bank_iban1;
+	$info['gateway_bank_swift'] = $gateway_bank_swift1;
+	$info['gateway_bank_name'] = $gateway_bank_name1;
+	$info['gateway_bank_city'] = $gateway_bank_city1;
+	$info['gateway_bank_country'] = $gateway_bank_country1;
+	
 	if ($passed_uniq) {
 		if (!$confirmed) {
-			API::add('Gateways','depositPreconditions',array($gateway_type1,$gateway_currency1,$gateway_amount1,$gateway_id1,$card_type1,$card_name1,$card_number1,$card_expiration_month1,$card_expiration_year1,$card_cvv1,$card_email1,$card_phone1,$card_address11,$card_address21,$card_city1,$card_state1,$card_country1,$card_zip1,$gateway_user1,$gateway_pass1,$gateway_bank_account1,$gateway_bank_iban1,$gateway_bank_swift1,$gateway_bank_name1,$gateway_bank_city1,$gateway_bank_country1));
+			API::add('Gateways','depositPreconditions',array($info));
 			$query = API::send();
 			$errors1 = $query['Gateways']['depositPreconditions']['results'][0];
 			if (!empty($errors1['error']))
 				Errors::add($errors1['error']['message']);
+			else if (!empty($errors1['offsite']))
+				Link::redirect($errors1['offsite'],$errors1['offsite_vars']);
 			else
 				$ask_confirm = true;
 		}
 		else {
-			API::add('Gateways','processDeposit',array($gateway_type1,$gateway_currency1,$gateway_amount1,$gateway_id1,$card_type1,$card_name1,$card_number1,$card_expiration_month1,$card_expiration_year1,$card_cvv1,$card_email1,$card_phone1,$card_address11,$card_address21,$card_city1,$card_state1,$card_country1,$card_zip1,$gateway_user1,$gateway_pass1,$gateway_bank_account1,$gateway_bank_iban1,$gateway_bank_swift1,$gateway_bank_name1,$gateway_bank_city1,$gateway_bank_country1));
+			API::add('Gateways','processDeposit',array($info));
 			$query = API::send();
 			$operations = $query['Gateways']['processDeposit']['results'][0];
 			
@@ -122,7 +165,6 @@ if ($_REQUEST['gateway_type']) {
 
 $currency_info = $CFG->currencies[$gateway_currency1];
 $page_title = Lang::string('deposit');
-setlocale(LC_TIME,$CFG->language.'_'.strtoupper($CFG->language));
 
 if (empty($_REQUEST['bypass'])) {
 	$_SESSION["deposit_uniq"][time()] = md5(uniqid(mt_rand(),true));

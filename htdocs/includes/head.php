@@ -174,7 +174,7 @@
 							<? } ?>
                             <li><a href="security.php"><?= Lang::string('security') ?></a></li>
                             <li><a href="settings.php"><?= Lang::string('settings') ?></a></li>
-                            <li><a href="bank-accounts.php"><?= Lang::string('bank-accounts') ?></a></li>
+                            <? /*><li><a href="bank-accounts.php"><?= Lang::string('bank-accounts') ?></a></li>*/ ?>
 							<li><a href="bitcoin-addresses.php"><?= Lang::string('bitcoin-addresses') ?></a></li>
 							<li><a href="history.php"><?= Lang::string('history') ?></a></li>
 							<li><a href="api-access.php"><?= Lang::string('api-access') ?></a></li>
