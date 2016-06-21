@@ -1239,6 +1239,9 @@ a.show_hide{
 	width: 80%;
 	left: 12px;
 }
+#chat-frame {
+	display:none;
+}
 
 ul.tci_list {
 	float:left;
