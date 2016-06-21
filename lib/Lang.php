@@ -15,6 +15,8 @@ class Lang {
 	public static function url($url=false,$get_alts=false,$get_js=false) {
 		global $CFG;
 		
+		$lang = ($CFG->language != 'tr') ? $CFG->language : 'en';
+		
 		$urls['index.php']['en'] = 'index.php';
 		$urls['index.php']['es'] = 'es/index.php';
 		$urls['index.php']['ru'] = 'ru/index.php';
@@ -69,13 +71,13 @@ class Lang {
 		$urls['terms.php']['zh'] = 'zh/'.urlencode('条件').'.php';
 
 		if (!$get_alts && !$get_js)
-			return $urls[$url][$CFG->language];
+			return $urls[$url][$lang];
 		elseif ($get_alts) {
 			$HTML = '';
 			
 			if (array_key_exists($url,$urls)) {
 				foreach ($urls[$url] as $lang1 => $url1) {
-					if ($lang1 == $CFG->language)
+					if ($lang1 == $lang || !($lang1 == 'tr' || $lang1 == 'en'))
 						continue;
 					
 					$HTML .= '<link rel="alternate" href="'.$CFG->baseurl.$url1.'" hreflang="'.$lang1.'" />';
@@ -87,7 +89,12 @@ class Lang {
 			$HTML = '';
 			foreach ($urls as $url1 => $arr) {
 				foreach ($arr as $lang2 => $url2) {
+					if (!($lang2 == 'tr' || $lang2 == 'en'))
+						continue;
+					
 					$HTML .= '<input type="hidden" id="url_'.str_replace('.','_',$url1).'_'.$lang2.'" value="'.$url2.'" />';
+					if ($lang2 == 'en')
+						$HTML .= '<input type="hidden" id="url_'.str_replace('.','_',$url1).'_tr" value="'.$url2.'" />';
 				}
 			}
 			return $HTML;

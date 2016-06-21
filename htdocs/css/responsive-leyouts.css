@@ -566,6 +566,9 @@ a.button_slider {
 	margin-top: 9px;
 	margin-bottom: 22px;
 	background:url(../images/logo.png) no-repeat center top;
+	height: 56px;
+	width: 80%;
+	left: 12px;
 }
 
 ul.tci_list {
@@ -1225,13 +1228,16 @@ a.show_hide{
 }
 
 .top_contact_info {
-	min-height: 90px;
+	min-height:45px;
 }
 
 #trueHeader #logo{
 	margin-top: 9px;
 	margin-bottom: 22px;
 	background:url(../images/logo.png) no-repeat center top;
+	height: 56px;
+	width: 80%;
+	left: 12px;
 }
 
 ul.tci_list {
@@ -1241,6 +1247,7 @@ ul.tci_list {
 }
 ul.tci_list_left{
 	padding:14px 0 0 10px;
+	display:none;
 }
 
 .tci_list_left li {
